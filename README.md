@@ -1,4 +1,3 @@
-# VerbalAbuse_StaticPhase
-Static Phase for our Verbal Abuse Project
+# Twitter Verbal Abuse
 
-For static demo please visit http://ats423.github.io/VerbalAbuse_Group2
+For current demo please visit http://ats423.github.io/VerbalAbuse_Group2
