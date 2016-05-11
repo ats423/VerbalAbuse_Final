@@ -10,13 +10,80 @@ import geojson
 import numpy as np
 
 
+json_data1=open('us-counties.json').read()
+State = geojson.loads(json_data1)
+
+def point_inside_polygon(x,y,poly):
+# From http://www.ariel.com.au/a/python-point-int-poly.html
+
+    n = len(poly)   
+    inside =False
+
+    p1x,p1y = poly[0]
+    for i in range(n+1):
+        p2x,p2y = poly[i % n]
+        if y > min(p1y,p2y):
+            if y <= max(p1y,p2y):
+                if x <= max(p1x,p2x):
+                    if p1y != p2y:
+                        xinters = (y-p1y)*(p2x-p1x)/(p2y-p1y)+p1x
+                    if p1x == p2x or x <= xinters:
+                        inside = not inside
+        p1x,p1y = p2x,p2y
+
+    return inside
+
+json_data2=open('Tweets_Geolocation.json').read()
+Tweets = geojson.loads(json_data2)
+
+json_data3=open('county-pop-FIPS.json').read()
+County_pop = json.loads(json_data3)
+
+for county in County_pop:
+    county.append(0.)
+
+# bd68113b191453fcf2a9b9c493a3dec7252514ff
+#State['features'][0]['counties'][0]['geometry']
+for twt in Tweets:
+    x = twt['coordinates']['coordinates'][0]
+    y = twt['coordinates']['coordinates'][1]
+    for st in State['features']:
+        for county in st['counties']:
+            poly = county['geometry']['coordinates'][0]
+            if len(np.shape(np.array(poly))) == 2:
+                #poly = st['geometry']['coordinates'][0]
+                if point_inside_polygon(x,y,poly):
+                    for c in County_pop[1:]:
+                        if c[1]==county['name']+" County" and c[2]==st['properties']['state']:
+                            #print("Hello world")
+                            c[4] += 1.  
+            
+tot_dens = 0.00
+for county in County_pop[1:]:
+    county.append(float(county[4]) / float(county[0]))
+    tot_dens += county[5]
+
+for county in County_pop[1:]:
+    county[5] = int(100.00*county[5] / tot_dens)
+    
+#with open('twtDensity-counties.json', 'w') as fp:
+#    json.dump(County_pop, fp)
+    
+    
+
+"""
+import json
+import geojson
+import numpy as np
+
+
 json_data1=open('us.json').read()
 State = geojson.loads(json_data1)
 
 def point_inside_polygon(x,y,poly):
 # From http://www.ariel.com.au/a/python-point-int-poly.html
 
-    n = len(poly)
+    n = len(poly)   
     inside =False
 
     p1x,p1y = poly[0]
@@ -73,7 +140,7 @@ for state in twtState['features']:
     
 with open('twtDensity.json', 'w') as fp:
     json.dump(twtState, fp)
-    
+"""
     
 """  
 
