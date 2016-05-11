@@ -40,8 +40,8 @@ var scale = d3.scale.sqrt()
     .domain([0,10]);
     
 queue()
-    .defer(d3.json, "us-states.json")
-    .defer(d3.json,  "twtDensity.json") // "us-state-centroids.json")
+    .defer(d3.json, "us-counties.json")
+    .defer(d3.json,  "twtDensity-counties.json") // "us-state-centroids.json")
     .await(ready);
 
 function ready(error, us, centroid) {
@@ -53,10 +53,10 @@ function ready(error, us, centroid) {
       .attr("d", path);
 
   svg.selectAll(".symbol")
-      .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }))
+      .data(centroid.features.sort(function(a, b) {return b.population - a.population; }))
       .enter().append("path")
       .attr("class", "symbol")
-      .attr("d", path.pointRadius(function(d) { return scale(d.properties.twtDensity); }));
+      .attr("d", path.pointRadius(function(d) { return scale(d.twtDensity); }));
   console.log(centroid.features)
     
         

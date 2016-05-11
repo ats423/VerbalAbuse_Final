@@ -36,11 +36,11 @@ def point_inside_polygon(x,y,poly):
 json_data2=open('Tweets_Geolocation.json').read()
 Tweets = geojson.loads(json_data2)
 
-json_data3=open('county-pop-FIPS.json').read()
+json_data3=open('county-pop-FIPS-dict.json').read()
 County_pop = json.loads(json_data3)
 
-for county in County_pop:
-    county.append(0.)
+for county in County_pop['features']:
+    county['count'] = 0. 
 
 # bd68113b191453fcf2a9b9c493a3dec7252514ff
 #State['features'][0]['counties'][0]['geometry']
@@ -53,21 +53,23 @@ for twt in Tweets:
             if len(np.shape(np.array(poly))) == 2:
                 #poly = st['geometry']['coordinates'][0]
                 if point_inside_polygon(x,y,poly):
-                    for c in County_pop[1:]:
-                        if c[1]==county['name']+" County" and c[2]==st['properties']['state']:
+                    for c in County_pop['features']:
+                        if c['county']==county['name']+" County" and c['state']==st['properties']['state']:
                             #print("Hello world")
-                            c[4] += 1.  
+                            c['count'] += 1.
+
             
 tot_dens = 0.00
-for county in County_pop[1:]:
-    county.append(float(county[4]) / float(county[0]))
-    tot_dens += county[5]
+for county in County_pop['features']:
+    county['twtDensity'] = float(county['count']) / float(county['population'])
+    tot_dens += county['twtDensity']
 
-for county in County_pop[1:]:
-    county[5] = int(100.00*county[5] / tot_dens)
+
+for county in County_pop['features']:
+  county['twtDensity'] = int(100.00*county['twtDensity'] / tot_dens)
     
-#with open('twtDensity-counties.json', 'w') as fp:
-#    json.dump(County_pop, fp)
+with open('twtDensity-counties.json', 'w') as fp:
+   json.dump(County_pop, fp)
     
     
 
