@@ -8,6 +8,8 @@ Created on Tue Apr 19 18:56:56 2016
 import json
 import geojson
 import numpy as np
+import shapely as shp
+from shapely.geometry import Polygon
 
 
 json_data1=open('us-counties.json').read()
@@ -41,6 +43,10 @@ County_pop = json.loads(json_data3)
 
 for county in County_pop['features']:
     county['count'] = 0. 
+    county['centroid'] = []
+
+buenos = 0
+malos = 0
 
 # bd68113b191453fcf2a9b9c493a3dec7252514ff
 #State['features'][0]['counties'][0]['geometry']
@@ -51,13 +57,27 @@ for twt in Tweets:
         for county in st['counties']:
             poly = county['geometry']['coordinates'][0]
             if len(np.shape(np.array(poly))) == 2:
-                #poly = st['geometry']['coordinates'][0]
                 if point_inside_polygon(x,y,poly):
                     for c in County_pop['features']:
                         if c['county']==county['name']+" County" and c['state']==st['properties']['state']:
                             #print("Hello world")
                             c['count'] += 1.
-
+                
+                
+for st in State['features']:
+    for county in st['counties']:
+        poly = county['geometry']['coordinates'][0]
+        if Polygon(poly).buffer(0).is_valid:
+            try:
+                pol_centroid = Polygon(poly).buffer(0).centroid.wkt
+                if len(np.shape(np.array(poly))) == 2:
+                #poly = st['geometry']['coordinates'][0]
+                    for c in County_pop['features']:
+                        if c['county']==county['name']+" County" and c['state']==st['properties']['state']:
+                            buenos += 1
+                            c['centroid'] = [float(pol_centroid[7:24]),float(pol_centroid[25:-1])]
+            except ValueError:
+                    continue
             
 tot_dens = 0.00
 for county in County_pop['features']:
@@ -70,8 +90,19 @@ for county in County_pop['features']:
     
 with open('twtDensity-counties.json', 'w') as fp:
    json.dump(County_pop, fp)
+   
+   
+
+json_data4=open('us-states.json').read()
+ustates = json.loads(json_data4)   
+   
+us_cc = {'type':"FeatureCollection","features":[]}
+
+for county in County_pop['features']:
+    us_cc['features'].append({'geometry':{'type':'Point','coordinates':county['centroid']},'properties':{'name':county['county'],'count':county['count'],'population':county['population']}}) 
+#us-cc = {'type':'FeatureCollection','features' : [0] }    
     
-    
+
 
 """
 import json
