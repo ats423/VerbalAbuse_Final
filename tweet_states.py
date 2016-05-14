@@ -87,19 +87,13 @@ for county in County_pop['features']:
 
 for county in County_pop['features']:
   county['twtDensity'] = int(100.00*county['twtDensity'] / tot_dens)
-    
 
-   
-   
-
-json_data4=open('us-states.json').read()
-ustates = json.loads(json_data4)   
    
 us_cc = {'type':"FeatureCollection","features":[]}
 
 cc = 0
 for county in County_pop['features']:
-    us_cc['features'].append({'type':'Feature','id':str(cc),'geometry':{'type':'Point','coordinates':county['centroid']},'properties':{'name':county['county'],'count':county['count'],'population':county['population']}}) 
+    us_cc['features'].append({'type':'Feature','id':str(cc),'geometry':{'type':'Point','coordinates':county['centroid']},'properties':{'name':county['county'],'count':county['count'],'population':county['population'],'twtDensity':county['twtDensity']}}) 
     cc += 1    
     #us-cc = {'type':'FeatureCollection','features' : [0] }    
     

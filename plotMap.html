@@ -38,6 +38,9 @@
         color: darkslateblue;
         
     }
+    .land{
+         fill: #222   
+        }
     </style>
 </head>
 
@@ -60,6 +63,7 @@
     var width = 960,
         height = 500;
     var path = d3.geo.path();
+    //  console.log(path)
     var svg = d3.select("body").append("svg")
         .attr("width", width)
         .attr("height", height);
@@ -69,7 +73,7 @@
     // Read source files
     queue()
         .defer(d3.json, "us-states.json")
-        .defer(d3.json,  "twtDensity.json") // "us-state-centroids.json")
+        .defer(d3.json,  "twtDensity-counties.json") // "us-state-centroids.json")
         .await(ready);
     // Useful functions
     function highlight(name){
@@ -86,6 +90,12 @@
     // Rendering
     function ready(error, us, centroid) {
       if (error) throw error;   
+//        
+//        svg.insert("path",".graticule")
+//            .datum(topojson.feature(us.objects.land))
+//            .attr("class","land")
+//            .attr("d",path)
+        
         svg.insert("path",".graticule")
             .attr("class", "counties")
             .datum(topojson.mesh(us, us.objects.counties,function(a,b) {return a !== b &&  !(a.id/1000 ^ b.id /1000); }))
@@ -95,7 +105,7 @@
             .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }))
             .enter().append("path")
             .attr("class", "symbol")
-            .attr("d", path.pointRadius(function(d) { return scale(d.properties.twtDensity); }))
+            .attr("d", path.pointRadius(function(d) {return scale(d.properties.twtDensity); }))
             .on("mouseenter",function(d,i){
                 //console.log(d.properties)
                 highlight(d.properties.name);
