@@ -2,25 +2,26 @@
 """
 Created on Tue Apr 19 18:56:56 2016
 
-@authors: Sara Arango and Neil Verosh
+@authors: Neil Verosh and Sara Arango 
 """
-
+# -- Load packages
 import json
 import geojson
 import numpy as np
-import shapely as shp
 from shapely.geometry import Polygon
 
 
-json_data1=open('us-counties.json').read()
-State = geojson.loads(json_data1)
+# -- Input data and input geometries
+Tweets = geojson.loads(open('./input_files/15_Keywords_Merged.json').read()) # input Twitter data
+State = geojson.loads(open('./input_files/us-counties.json').read()) # geometries and names of counties
+County_pop = json.loads(open('./input_files/county-pop-FIPS-dict.json').read()) # counties with population
 
+
+# -- Function to know if a point is inside a polygon.
 def point_inside_polygon(x,y,poly):
 # From http://www.ariel.com.au/a/python-point-int-poly.html
-
     n = len(poly)   
     inside =False
-
     p1x,p1y = poly[0]
     for i in range(n+1):
         p2x,p2y = poly[i % n]
@@ -32,24 +33,13 @@ def point_inside_polygon(x,y,poly):
                     if p1x == p2x or x <= xinters:
                         inside = not inside
         p1x,p1y = p2x,p2y
-
     return inside
 
-json_data2=open('Tweets_Geolocation.json').read()
-Tweets = geojson.loads(json_data2)
 
-json_data3=open('county-pop-FIPS-dict.json').read()
-County_pop = json.loads(json_data3)
-
+# -- Assigning a count of tweets per county where there was a tweet.
 for county in County_pop['features']:
     county['count'] = 0. 
     county['centroid'] = []
-
-buenos = 0
-malos = 0
-
-# bd68113b191453fcf2a9b9c493a3dec7252514ff
-#State['features'][0]['counties'][0]['geometry']
 for twt in Tweets:
     x = twt['coordinates']['coordinates'][0]
     y = twt['coordinates']['coordinates'][1]
@@ -63,7 +53,8 @@ for twt in Tweets:
                             #print("Hello world")
                             c['count'] += 1.
                 
-                
+
+# -- Creating a field for the geometry (centroid) of each county          
 for st in State['features']:
     for county in st['counties']:
         poly = county['geometry']['coordinates'][0]
@@ -71,33 +62,29 @@ for st in State['features']:
             try:
                 pol_centroid = Polygon(poly).buffer(0).centroid.wkt
                 if len(np.shape(np.array(poly))) == 2:
-                #poly = st['geometry']['coordinates'][0]
                     for c in County_pop['features']:
                         if c['county']==county['name']+" County" and c['state']==st['properties']['state']:
-                            buenos += 1
                             c['centroid'] = [float(pol_centroid[7:24]),float(pol_centroid[25:-1])]
             except ValueError:
                     continue
-            
+          
+          
+# -- Normalizing offensive tweets by population           
 tot_dens = 0.00
 for county in County_pop['features']:
     county['twtDensity'] = float(county['count']) / float(county['population'])
     tot_dens += county['twtDensity']
-
-
 for county in County_pop['features']:
   county['twtDensity'] = int(100.00*county['twtDensity'] / tot_dens)
 
-   
-us_cc = {'type':"FeatureCollection","features":[]}
 
+# -- Filling out and saving a dictionary to read from d3.   
+us_cc = {'type':"FeatureCollection","features":[]}
 cc = 0
 for county in County_pop['features']:
     us_cc['features'].append({'type':'Feature','id':str(cc),'geometry':{'type':'Point','coordinates':county['centroid']},'properties':{'name':county['county'],'count':county['count'],'population':county['population'],'twtDensity':county['twtDensity']}}) 
-    cc += 1    
-    #us-cc = {'type':'FeatureCollection','features' : [0] }    
-    
-with open('twtDensity-counties.json', 'w') as fp:
+    cc += 1      
+with open('./input_files/twtDensity-counties.json', 'w') as fp:
    json.dump(us_cc, fp) 
 
 """
@@ -172,7 +159,6 @@ with open('twtDensity.json', 'w') as fp:
 """
     
 """  
-
 dic = {'type': "FeatureCollection","features":[]}
 
 for state in State['features']:
