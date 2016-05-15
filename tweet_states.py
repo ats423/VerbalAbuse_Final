@@ -12,14 +12,13 @@ from shapely.geometry import Polygon
 
 
 # -- Input data and input geometries
-Tweets = geojson.loads(open('./input_files/15_Keywords_Merged.json').read()) # input Twitter data
+Tweets = geojson.loads(open('./input_files/Tweets_Geolocation.json').read()) # input Twitter data
 State = geojson.loads(open('./input_files/us-counties.json').read()) # geometries and names of counties
 County_pop = json.loads(open('./input_files/county-pop-FIPS-dict.json').read()) # counties with population
 
 
-# -- Function to know if a point is inside a polygon.
+# -- Function to know if a point is inside a polygon. From http://www.ariel.com.au/a/python-point-int-poly.html
 def point_inside_polygon(x,y,poly):
-# From http://www.ariel.com.au/a/python-point-int-poly.html
     n = len(poly)   
     inside =False
     p1x,p1y = poly[0]
@@ -50,7 +49,6 @@ for twt in Tweets:
                 if point_inside_polygon(x,y,poly):
                     for c in County_pop['features']:
                         if c['county']==county['name']+" County" and c['state']==st['properties']['state']:
-                            #print("Hello world")
                             c['count'] += 1.
                 
 
@@ -60,7 +58,7 @@ for st in State['features']:
         poly = county['geometry']['coordinates'][0]
         if Polygon(poly).buffer(0).is_valid:
             try:
-                pol_centroid = Polygon(poly).buffer(0).centroid.wkt
+                pol_centroid = Polygon(poly).buffer(0).representative_point().wkt
                 if len(np.shape(np.array(poly))) == 2:
                     for c in County_pop['features']:
                         if c['county']==county['name']+" County" and c['state']==st['properties']['state']:
@@ -88,11 +86,6 @@ with open('./input_files/twtDensity-counties.json', 'w') as fp:
    json.dump(us_cc, fp) 
 
 """
-import json
-import geojson
-import numpy as np
-
-
 json_data1=open('us.json').read()
 State = geojson.loads(json_data1)
 

@@ -6,9 +6,9 @@
     <style>
 
     .symbol {
-      fill: steelblue;
-      fill-opacity: .8;
-      stroke: #fff;
+        fill: steelblue;
+        fill-opacity: .8;
+        stroke-width = 1px;
     }
         
     #tooltip {
@@ -23,14 +23,14 @@
     }
         
     .counties {
-        fill: #ccc;
-        stroke: #fff;
-        stroke-width = .1px   ; 
+        fill: rgb(242, 242, 242);
+        stroke: #999;
+        stroke-width = .005px   ; 
     }
     
     .state-boundary{
-        fill: None;
-        stroke: #fff; 
+        fill: none;
+        stroke: #222; 
     }
         
     #title{
@@ -39,7 +39,8 @@
         
     }
     .land{
-         fill: #222   
+        fill: none;
+        stroke: #222;
         }
     </style>
 </head>
@@ -51,12 +52,11 @@
 <script src="https://d3js.org/queue.v1.min.js"></script>
     
 <div id="title"> 
-    <h1> Tweets containing the world "abortion" in the United States </h1>
+    <h1> Offensive tweets towards women in the United States during the last 6 hours </h1>
 </div>
 <div id="tooltip"> Tooltip </div>
 
 </body>
-
 
 <script>
     // Defining useful variables
@@ -68,12 +68,12 @@
         .attr("width", width)
         .attr("height", height);
     var scale = d3.scale.sqrt()
-        .range([5,50])
+        .range([2,50])
         .domain([0,100]);
     // Read source files
     queue()
-        .defer(d3.json, "us-states.json")
-        .defer(d3.json,  "twtDensity-counties.json") // "us-state-centroids.json")
+        .defer(d3.json, "./input_files/us-states.json")
+        .defer(d3.json,  "./input_files/twtDensity-counties.json") // "us-state-centroids.json")
         .await(ready);
     // Useful functions
     function highlight(name){
@@ -90,16 +90,25 @@
     // Rendering
     function ready(error, us, centroid) {
       if (error) throw error;   
+        console.log(us.objects.land)
 //        
-//        svg.insert("path",".graticule")
-//            .datum(topojson.feature(us.objects.land))
-//            .attr("class","land")
-//            .attr("d",path)
+
         
         svg.insert("path",".graticule")
             .attr("class", "counties")
-            .datum(topojson.mesh(us, us.objects.counties,function(a,b) {return a !== b &&  !(a.id/1000 ^ b.id /1000); }))
+            .datum(topojson.feature(us, us.objects.counties))
+            //.datum(topojson.mesh(us, us.objects.counties,function(a,b) {return a !== b &&  !(a.id/1000 ^ b.id /1000); }))
             .attr("d", path);
+        
+        svg.insert("path",".graticule")
+            .datum(topojson.mesh(us,us.objects.states, function(a,b){return a!==b;}))
+            .attr("class","state-boundary")
+            .attr("d",path);
+        
+        svg.insert("path",".graticule")
+            .datum(topojson.feature(us,us.objects.land))
+            .attr("class","land")
+            .attr("d",path);
         
         svg.selectAll(".symbol")
             .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }))

@@ -1,7 +1,7 @@
 import json
 
 #Reading in the json file with tweets
-json_data=open('Day1_Tweets.json').read()
+json_data=open('./input_files/Tweets_Geolocation.json').read()
 Tweets = json.loads(json_data)
 
 #Initializing a dictionary with keywords used for queries
@@ -21,3 +21,5 @@ for tweet in Tweets:
 			keywords[k] += 1
 
 #print keywords
+with open('./input_files/twtCount.json', 'w') as fp:
+   json.dump(keywords, fp) 
