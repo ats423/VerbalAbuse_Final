@@ -13,12 +13,14 @@ for k, v in keywords.iteritems():
 	if v == None:
 		keywords[k] = 0
 
-#print len(Tweets)
+print len(Tweets)
 
 for tweet in Tweets:
 	for k, v in keywords.iteritems():
 		if k.lower() in tweet['text'].encode('utf-8').lower():
 			keywords[k] += 1
+
+print sum(keywords.itervalues())
 
 #print keywords
 with open('./input_files/twtCount.json', 'w') as fp:
