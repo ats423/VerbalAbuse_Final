@@ -69,6 +69,7 @@
     <div id="wrapper"> 
         <g id="hist1"></g>
         <g id="hist2"></g>
+        <g id="hist3"></g>
     </div>
     
     <div id="mapWrapper" preserveAspectRatio = "xMidYMid meet" viewbox = "0 0 500 200" width = 400 height = 300> 
@@ -111,70 +112,69 @@
     
     // READ TWEET COUNTS FOR KEYWORDS    
 
-        d3.json("./input_files/twtCount.json",function(error, result){
-            data = result; 
-            var insults = Object.keys(data)
-            var totfrequency = Object.keys(data).map(function(key){
-                return +data[key];
-                });
-            for(var i=0; i<totfrequency.length;i++) totfrequency[i] = +totfrequency[i]/1;
+    d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount.json",function(error, result){
+        data = result; 
+        var insults = Object.keys(data)
+        var totfrequency = Object.keys(data).map(function(key){
+            return +data[key];
+            });
+        for(var i=0; i<totfrequency.length;i++) totfrequency[i] = +totfrequency[i]/1;
+    
+        console.log(insults)
+        console.log(totfrequency)
+        function max(num){
+            return Math.max.apply(null, num);
+        }
         
-            console.log(insults)
-            console.log(totfrequency)
-            function max(num){
-                return Math.max.apply(null, num);
-            }
-            
-            console.log();
-            var xscale = d3.scale.linear()
-                            .domain([0,max(totfrequency)])
-                            .range([0,150]);
+        console.log();
+        var xscale = d3.scale.linear()
+                        .domain([0,max(totfrequency)])
+                        .range([0,150]);
 
-            var yscale = d3.scale.linear()
-                            .domain([0,insults.length])
-                            .range([0,150]);
+        var yscale = d3.scale.linear()
+                        .domain([0,insults.length])
+                        .range([0,150]);
 
-            var canvas = d3.select('#hist1')
-                            .append('svg')
-                            .attr({'width':200,'height':200});
+        var canvas1 = d3.select('#hist1')
+                        .append('svg')
+                        .attr({'width':200,'height':200});
 
 
-            var	yAxis = d3.svg.axis();
-                yAxis
-                    .orient('left')
-                    .scale(yscale)
-                    .tickSize(2)
-                    .tickFormat(function(d,i){ return insults[i]; })
-                    .tickValues(d3.range(17));
+        var	yAxis = d3.svg.axis();
+            yAxis
+                .orient('left')
+                .scale(yscale)
+                .tickSize(2)
+                .tickFormat(function(d,i){ return insults[i]; })
+                .tickValues(d3.range(17));
 
-            var y_xis = canvas.append('g')
-                              .attr("transform", "translate(50,20)")
-                              .attr('id','yaxis')
-                              .call(yAxis);
+        var y_xis = canvas1.append('g')
+                          .attr("transform", "translate(50,20)")
+                          .attr('id','yaxis')
+                          .call(yAxis);
 
-            var chart = canvas.append('g')
-                                .attr("transform", "translate(50,0)")
-                                .attr('id','bars')
-                                .selectAll('rect')
-                                .data(totfrequency)
-                                .enter()
-                                .append('rect')
-                                .attr('height',5)
-                                .attr({'x':0,'y':function(d,i){ return yscale(i)+19; }})
-                                .attr('width',function(d){ return 0; });
+        var chart = canvas1.append('g')
+                            .attr("transform", "translate(50,5)")
+                            .attr('id','bars')
+                            .selectAll('rect')
+                            .data(totfrequency)
+                            .enter()
+                            .append('rect')
+                            .attr('height',5)
+                            .attr({'x':0,'y':function(d,i){ return yscale(i)+14; }})
+                            .attr('width',function(d){ return 0; });
 
 
-            var transit = d3.select("svg").selectAll("rect")
-                                .data(totfrequency)
-                                .transition()
-                                .duration(1000) 
-                                .attr("width", function(d) {return xscale(d); });
+        var transit = d3.select("#hist1").selectAll("rect")
+                            .data(totfrequency)
+                            .transition()
+                            .duration(1000) 
+                            .attr("width", function(d) {return xscale(d); });
 
-            
         })
     
-    //  
-    d3.json("./input_files/twtCount-hashtags.json",function(error, result){
+    // READ TWEETS FOR HASTAGS 
+    d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount-hashtags.json",function(error, result){
             data = result; 
             var hashtags = Object.keys(data)
             var hashfreq = Object.keys(data).map(function(key){
@@ -197,10 +197,9 @@
                             .domain([0,hashtags.length])
                             .range([0,100]);
 
-            var canvas1 = d3.select('#hist2')
+            var canvas2 = d3.select('#hist2')
                             .append('svg')
                             .attr({'width':300,'height':200})
-                            .attr("transform", "translate(450,50)");
 
 
             var	yAxis = d3.svg.axis();
@@ -211,13 +210,13 @@
                     .tickFormat(function(d,i){ return hashtags[i]; })
                     .tickValues(d3.range(hashtags.length));
 
-            var y_xis = canvas1.append('g')
-                              .attr("transform", "translate(150,50)")
+            var y_xis = canvas2.append('g')
+                              .attr("transform", "translate(150,20)")
                               .attr('id','yaxis')
                               .call(yAxis);
 
-            var chart = canvas1.append('g')
-                                .attr("transform", "translate(150,50)")
+            var chart = canvas2.append('g')
+                                .attr("transform", "translate(150,5)")
                                 .attr('id','bars')
                                 .selectAll('rect')
                                 //.attr("transform", "translate(450,50)")
@@ -228,18 +227,85 @@
                                 //.attr("y",300)
                                 //.attr("transform", "translate(150,50)")
                                 .attr('height',5)
-                                .attr({'x':0,'y':function(d,i){ return yscale(i)+19; }})
+                                .attr({'x':0,'y':function(d,i){ return yscale(i)+14; }})
                                 .attr('width',function(d){ return 0; });
 
 
-            var transit = d3.select("svg").selectAll("rect")
+            var transit = d3.select("#hist2").selectAll("rect")
                                 .data(hashfreq)
                                 .transition()
                                 .duration(1000) 
                                 .attr("width", function(d) {return xscale(d);});
             
         })
-    
+
+    // READ TWEETS FOR MENTIONS 
+    d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount-mentions.json",function(error, result){
+            data = result; 
+            var mentions = Object.keys(data)
+            var mentfreq = Object.keys(data).map(function(key){
+                return +data[key];
+                });
+            for(var i=0; i<mentfreq.length;i++) mentfreq[i] = +mentfreq[i]/1;
+        
+            console.log(mentions)
+            console.log(mentfreq)
+            function max(num){
+                return Math.max.apply(null, num);
+            }
+            
+            console.log();
+            var xscale = d3.scale.linear()
+                            .domain([0,max(mentfreq)])
+                            .range([0,150]);
+
+            var yscale = d3.scale.linear()
+                            .domain([0,mentions.length])
+                            .range([0,100]);
+
+            var canvas3 = d3.select('#hist3')
+                            .append('svg')
+                            .attr({'width':300,'height':200})
+
+
+            var yAxis = d3.svg.axis();
+                yAxis
+                    .orient('left')
+                    .scale(yscale)
+                    .tickSize(2)
+                    .tickFormat(function(d,i){ return mentions[i]; })
+                    .tickValues(d3.range(mentions.length));
+
+            var y_xis = canvas3.append('g')
+                              .attr("transform", "translate(250,20)")
+                              .attr('id','yaxis')
+                              .call(yAxis);
+
+            var chart = canvas3.append('g')
+                                .attr("transform", "translate(250,5)")
+                                .attr('id','bars')
+                                .selectAll('rect')
+                                //.attr("transform", "translate(450,50)")
+                                .data(mentfreq)
+                                .enter()
+                                .append('rect')
+                                //.attr("x",450)
+                                //.attr("y",300)
+                                //.attr("transform", "translate(150,50)")
+                                .attr('height',5)
+                                .attr({'x':0,'y':function(d,i){ return yscale(i)+14; }})
+                                .attr('width',function(d){ return 0; });
+
+
+            var transit = d3.select("#hist3").selectAll("rect")
+                                .data(mentfreq)
+                                .transition()
+                                .duration(1000) 
+                                .attr("width", function(d) {return xscale(d);});
+            
+        })
+
+
     
 
     // Useful functions
@@ -258,12 +324,12 @@
     
     // Read source files
     queue()
-        .defer(d3.json, "./input_files/us-states.json")
-        .defer(d3.json,  "./input_files/twtDensity-counties.json") // "us-state-centroids.json")
-        .defer(d3.json,  "./input_files/twtCount.json") // "us-state-centroids.json")
+        .defer(d3.json, "https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/us-states.json")
+        .defer(d3.json,  "https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtDensity-counties.json") // "us-state-centroids.json")
+        .defer(d3.json,  "https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount.json") // "us-state-centroids.json")
         .await(ready);
     
-    // Rendering
+    // RENDERING MAP
     function ready(error, us, centroid, keywords) {
       if (error) throw error;   
 //        
