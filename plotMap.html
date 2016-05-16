@@ -25,7 +25,14 @@
     .counties {
         fill: rgb(242, 242, 242);
         stroke: #999;
-        stroke-width = .005px   ; 
+        stroke-width = .005px; 
+    }
+        
+    #mapWrapper{
+        margin:2%;
+		padding:20px;
+		border:2px solid #d0d0d0;
+		border-radius: 5px; 
     }
     
     .state-boundary{
@@ -36,45 +43,205 @@
     #title{
         font: 12px sans-serif; 
         color: darkslateblue;
-        
     }
     .land{
         fill: none;
         stroke: #222;
-        }
+    }
+        
+    #xaxis .domain {
+		fill:none;
+		stroke:#000;
+    }
+	#xaxis text, #yaxis text {
+		font-size: 12px;
+    }
     </style>
 </head>
 
 
-<body>
-<script src="https://d3js.org/d3.v3.min.js"></script>
-<script src="https://d3js.org/topojson.v1.min.js"></script>
-<script src="https://d3js.org/queue.v1.min.js"></script>
+<body >
+
+    <div id="title"> 
+        <h1> Offensive tweets towards women in the United States during the last 6 hours </h1>
+    </div>
+    <div id="tooltip"> Tooltip </div>
+    <div id="wrapper"> 
+        <g id="hist1"></g>
+        <g id="hist2"></g>
+    </div>
     
-<div id="title"> 
-    <h1> Offensive tweets towards women in the United States during the last 6 hours </h1>
-</div>
-<div id="tooltip"> Tooltip </div>
+    <div id="mapWrapper" preserveAspectRatio = "xMidYMid meet" viewbox = "0 0 500 200" width = 400 height = 300> 
+        <g id="USmap" > </g>
+    </div>
 
 </body>
 
-<script>
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script src="https://d3js.org/topojson.v1.min.js"></script>
+<script src="https://d3js.org/queue.v1.min.js"></script>
+
+<script type="text/javascript">
     // Defining useful variables
-    var width = 960,
-        height = 500;
-    var path = d3.geo.path();
+     var width = 900,
+         height = 500;
+
+    
+    var projection = d3.geo.albersUsa()
+        .scale(800);
+    
+    var path = d3.geo.path()
+        .projection(projection);
     //  console.log(path)
-    var svg = d3.select("body").append("svg")
+   
+    var svg = d3.select("#mapWrapper")
+		.append("svg")
+		//.attr("width", "100%");
         .attr("width", width)
         .attr("height", height);
+
+          
     var scale = d3.scale.sqrt()
-        .range([2,50])
-        .domain([0,100]);
-    // Read source files
-    queue()
-        .defer(d3.json, "./input_files/us-states.json")
-        .defer(d3.json,  "./input_files/twtDensity-counties.json") // "us-state-centroids.json")
-        .await(ready);
+        .range([0,30])
+        .domain([0,50]);
+    
+    var data;
+    
+    var wordSelect = "Total"
+    
+    // READ TWEET COUNTS FOR KEYWORDS    
+
+        d3.json("./input_files/twtCount.json",function(error, result){
+            data = result; 
+            var insults = Object.keys(data)
+            var totfrequency = Object.keys(data).map(function(key){
+                return +data[key];
+                });
+            for(var i=0; i<totfrequency.length;i++) totfrequency[i] = +totfrequency[i]/1;
+        
+            console.log(insults)
+            console.log(totfrequency)
+            function max(num){
+                return Math.max.apply(null, num);
+            }
+            
+            console.log();
+            var xscale = d3.scale.linear()
+                            .domain([0,max(totfrequency)])
+                            .range([0,150]);
+
+            var yscale = d3.scale.linear()
+                            .domain([0,insults.length])
+                            .range([0,150]);
+
+            var canvas = d3.select('#hist1')
+                            .append('svg')
+                            .attr({'width':200,'height':200});
+
+
+            var	yAxis = d3.svg.axis();
+                yAxis
+                    .orient('left')
+                    .scale(yscale)
+                    .tickSize(2)
+                    .tickFormat(function(d,i){ return insults[i]; })
+                    .tickValues(d3.range(17));
+
+            var y_xis = canvas.append('g')
+                              .attr("transform", "translate(50,20)")
+                              .attr('id','yaxis')
+                              .call(yAxis);
+
+            var chart = canvas.append('g')
+                                .attr("transform", "translate(50,0)")
+                                .attr('id','bars')
+                                .selectAll('rect')
+                                .data(totfrequency)
+                                .enter()
+                                .append('rect')
+                                .attr('height',5)
+                                .attr({'x':0,'y':function(d,i){ return yscale(i)+19; }})
+                                .attr('width',function(d){ return 0; });
+
+
+            var transit = d3.select("svg").selectAll("rect")
+                                .data(totfrequency)
+                                .transition()
+                                .duration(1000) 
+                                .attr("width", function(d) {return xscale(d); });
+
+            
+        })
+    
+    //  
+    d3.json("./input_files/twtCount-hashtags.json",function(error, result){
+            data = result; 
+            var hashtags = Object.keys(data)
+            var hashfreq = Object.keys(data).map(function(key){
+                return +data[key];
+                });
+            for(var i=0; i<hashfreq.length;i++) hashfreq[i] = +hashfreq[i]/1;
+        
+            console.log(hashtags)
+            console.log(hashfreq)
+            function max(num){
+                return Math.max.apply(null, num);
+            }
+            
+            console.log();
+            var xscale = d3.scale.linear()
+                            .domain([0,max(hashfreq)])
+                            .range([0,150]);
+
+            var yscale = d3.scale.linear()
+                            .domain([0,hashtags.length])
+                            .range([0,100]);
+
+            var canvas1 = d3.select('#hist2')
+                            .append('svg')
+                            .attr({'width':300,'height':200})
+                            .attr("transform", "translate(450,50)");
+
+
+            var	yAxis = d3.svg.axis();
+                yAxis
+                    .orient('left')
+                    .scale(yscale)
+                    .tickSize(2)
+                    .tickFormat(function(d,i){ return hashtags[i]; })
+                    .tickValues(d3.range(hashtags.length));
+
+            var y_xis = canvas1.append('g')
+                              .attr("transform", "translate(150,50)")
+                              .attr('id','yaxis')
+                              .call(yAxis);
+
+            var chart = canvas1.append('g')
+                                .attr("transform", "translate(150,50)")
+                                .attr('id','bars')
+                                .selectAll('rect')
+                                //.attr("transform", "translate(450,50)")
+                                .data(hashfreq)
+                                .enter()
+                                .append('rect')
+                                //.attr("x",450)
+                                //.attr("y",300)
+                                //.attr("transform", "translate(150,50)")
+                                .attr('height',5)
+                                .attr({'x':0,'y':function(d,i){ return yscale(i)+19; }})
+                                .attr('width',function(d){ return 0; });
+
+
+            var transit = d3.select("svg").selectAll("rect")
+                                .data(hashfreq)
+                                .transition()
+                                .duration(1000) 
+                                .attr("width", function(d) {return xscale(d);});
+            
+        })
+    
+    
+
     // Useful functions
     function highlight(name){
         svg.selectAll(".symbol")
@@ -87,25 +254,41 @@
         svg.selectAll(".symbol")
             .style("stroke", undefined)
     }
+    
+    
+    // Read source files
+    queue()
+        .defer(d3.json, "./input_files/us-states.json")
+        .defer(d3.json,  "./input_files/twtDensity-counties.json") // "us-state-centroids.json")
+        .defer(d3.json,  "./input_files/twtCount.json") // "us-state-centroids.json")
+        .await(ready);
+    
     // Rendering
-    function ready(error, us, centroid) {
+    function ready(error, us, centroid, keywords) {
       if (error) throw error;   
-        console.log(us.objects.land)
 //        
-
-        
-        svg.insert("path",".graticule")
+            
+        svg.append("path",".graticule")
+            .style("width", "100%")
+            //.style("height", height)
             .attr("class", "counties")
+            //.attr("transform","translate(300,-100)")
             .datum(topojson.feature(us, us.objects.counties))
             //.datum(topojson.mesh(us, us.objects.counties,function(a,b) {return a !== b &&  !(a.id/1000 ^ b.id /1000); }))
             .attr("d", path);
         
-        svg.insert("path",".graticule")
+        svg.append("path",".graticule")
+            .style("width", "100%")
+            //.style("width", width)
+            //.style("height", height)
             .datum(topojson.mesh(us,us.objects.states, function(a,b){return a!==b;}))
             .attr("class","state-boundary")
             .attr("d",path);
         
-        svg.insert("path",".graticule")
+        svg.append("path",".graticule")
+            .style("width", "100%")
+            //.style("width", width)
+            //.style("height", height)
             .datum(topojson.feature(us,us.objects.land))
             .attr("class","land")
             .attr("d",path);
@@ -114,7 +297,7 @@
             .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }))
             .enter().append("path")
             .attr("class", "symbol")
-            .attr("d", path.pointRadius(function(d) {return scale(d.properties.twtDensity); }))
+            .attr("d", path.pointRadius(function(d) {return scale(d.properties.twtDensity); })) // change to twtDensity
             .on("mouseenter",function(d,i){
                 //console.log(d.properties)
                 highlight(d.properties.name);
