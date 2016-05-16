@@ -39,4 +39,7 @@ for key in hashtags.iterkeys():
 
 
 print sum(hashtags.itervalues())
+
+with open('./input_files/twtCount-hashtags.json', 'w') as fp:
+   json.dump(hashtags, fp) 
 #print hashtags

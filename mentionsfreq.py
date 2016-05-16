@@ -63,3 +63,6 @@ print sum(usernames.itervalues())
 #print usernames
 print sum(realnames.itervalues())
 #print realnames
+
+with open('./input_files/twtCount-mentions.json', 'w') as fp:
+   json.dump(usernames, fp) 
