@@ -34,7 +34,7 @@ for key in hashtags.iterkeys():
 	for tweet in Tweets:
 		if tweet['entities']['hashtags']:
 			for tag in tweet['entities']['hashtags']:
-				if str(key) == str(tag['text']):
+				if str(key) == '#'+str(tag['text']):
 					hashtags[key] += 1
 
 

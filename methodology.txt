@@ -1,0 +1,2 @@
+List of stop words in Json:
+https://github.com/6/stopwords
