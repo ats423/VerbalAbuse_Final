@@ -16,7 +16,7 @@ for tweet in Tweets:
 
 				if str(tag['text']) not in tagsset:
 					#tags.append(str(tag['text']))
- 					tagsset.add(str(tag['text']))
+ 					tagsset.add('#'+str(tag['text']))
 
 			except:
 
@@ -41,5 +41,5 @@ for key in hashtags.iterkeys():
 print sum(hashtags.itervalues())
 
 with open('./input_files/twtCount-hashtags.json', 'w') as fp:
-   json.dump(hashtags, fp) 
+    json.dump(hashtags, fp) 
 #print hashtags
