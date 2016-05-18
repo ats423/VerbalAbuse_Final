@@ -7,6 +7,15 @@
     body {
         font-family:"Lucida Grande","Droid Sans",Arial,Helvetica,sans-serif;
     }
+
+    h2 {
+        font-family: arial, sans-serif;
+        font-size: 14px;
+        font-weight: bold;
+        margin-top: 0px;
+        margin-bottom: 10px;
+        text-align: center;
+    }
     .symbol {
         fill: steelblue;
         fill-opacity: .8;
@@ -59,11 +68,23 @@
 		font-size: 12px;
     }
         
-    .wordsList{
-        list-style: none;
-        padding: 10px;
-        float: left
-    }    
+    .wordsList {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+        text-align: center;
+    }   
+
+    .listItem { display: inline; list-style-type: none;}
+
+    .listItem {
+        list-style-type: none;
+        text-decoration: none;
+        padding: .2em 1em;
+        color: #fff;
+        background-color: #036;
+    } 
+
     </style>
 </head>
 
@@ -76,16 +97,20 @@
     <div id="tooltip"> Tooltip </div>
     <div id="wrapper"> 
         <g id="hist1">
+            <!-- <h2>Frequency of various abusive words</h2> -->
         </g>
         <g id="hist2">
+            <!-- <h2>Frequency of hashtags used with the words</h2> -->
         </g>
         <g id="hist3">
+            <!-- <h2>Frequency of users targetted by abusive words</h2> -->
         </g>
         
     </div>
     
 
     <div>
+        <h2> Words that often co-occur with abusive words</h2>
         <ul class="wordsList" id = "wordsList"></ul> 
     </div>
     
@@ -186,6 +211,16 @@
                                 .attr({'x':0,'y':function(d,i){ return yscale(i)+14; }})
                                 .attr('width',function(d){ return 0; });
 
+            var heading = canvas1.append("text")
+                                //.attr("x", (width / 2))             
+                                //.attr("y", 0 - (margin.top / 2))
+                                .attr("transform", "translate(100,10)")
+                                .attr("text-anchor", "middle")  
+                                .style("font-size", "11px") 
+                                .style("text-decoration", "underline") 
+                                .style("font-weight", "bold") 
+                                .text("Frequency of various abusive words");
+
 
             var transit = d3.select("#hist1").selectAll("rect")
                                 .data(totfrequency)
@@ -236,12 +271,12 @@
                         .tickValues(d3.range(hashtags.length));
 
                 var y_xis = canvas2.append('g')
-                                  .attr("transform", "translate(150,20)")
+                                  .attr("transform", "translate(180,35)")
                                   .attr('id','yaxis1')
                                   .call(yAxis);
 
                 var chart = canvas2.append('g')
-                                    .attr("transform", "translate(150,5)")
+                                    .attr("transform", "translate(180,20)")
                                     .attr('id','bars')
                                     .selectAll('rect')
                                     .data(hashfreq)
@@ -250,6 +285,16 @@
                                     .attr('height',5)
                                     .attr({'x':0,'y':function(d,i){ return yscale(i)+14; }})
                                     .attr('width',function(d){ return 0; });
+
+                var heading = canvas2.append("text")
+                                    //.attr("x", (width / 2))             
+                                    //.attr("y", 0 - (margin.top / 2))
+                                    .attr("transform", "translate(170,12)")
+                                    .attr("text-anchor", "middle")  
+                                    .style("font-size", "11px") 
+                                    .style("text-decoration", "underline") 
+                                    .style("font-weight", "bold") 
+                                    .text("Frequency of hashtags used with the words");
 
 
                 var transit = d3.select("#hist2").selectAll("rect")
@@ -348,6 +393,15 @@
                                     .attr({'x':0,'y':function(d,i){ return yscale(i)+14; }})
                                     .attr('width',function(d){ return 0; });
 
+                var heading = canvas3.append("text")
+                                    //.attr("x", (width / 2))             
+                                    //.attr("y", 0 - (margin.top / 2))
+                                    .attr("transform", "translate(270,8)")
+                                    .attr("text-anchor", "middle")  
+                                    .style("font-size", "11px") 
+                                    .style("text-decoration", "underline") 
+                                    .style("font-weight", "bold") 
+                                    .text("Frequency of users targetted by abusive words");
 
                 var transit = d3.select("#hist3").selectAll("rect")
                                     .data(mentfreq)
@@ -433,28 +487,28 @@
             .attr("class","land")
             .attr("d",path);
         
-//        svg.selectAll(".symbol")
-//            .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }))
-//            .enter().append("path")
-//            .attr("class", "symbol")
-//            .attr("d", path.pointRadius(function(d) {
-//                return scale(d.properties.twtDensity[word]); })) // change to twtDensity
-//            .on("mouseenter",function(d,i){
-//                console.log(d.properties)
-//                highlight(d.properties.name);
-//                d3.select("#tooltip").style({
-//                    visibility: "visible",
-//                    top: (d3.event.clientY)+"px",
-//                    left: (d3.event.clientX)+"px",
-//                    opacity: 1
-//                }).text(d.properties.name + ":" + d.properties.twtDensity[word]+'%')
-//            })
-//            .on("mouseleave",function(d,i){
-//                unHighlight();
-//                d3.select("#tooltip").style({
-//                    visibility: "hidden"
-//                })
-//            })
+       svg.selectAll(".symbol")
+           .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }))
+           .enter().append("path")
+           .attr("class", "symbol")
+           .attr("d", path.pointRadius(function(d) {
+               return scale(d.properties.twtDensity[word]); })) // change to twtDensity
+           .on("mouseenter",function(d,i){
+               console.log(d.properties)
+               highlight(d.properties.name);
+               d3.select("#tooltip").style({
+                   visibility: "visible",
+                   top: (d3.event.clientY)+"px",
+                   left: (d3.event.clientX)+"px",
+                   opacity: 1
+               }).text(d.properties.name + ":" + d.properties.twtDensity[word]+'%')
+           })
+           .on("mouseleave",function(d,i){
+               unHighlight();
+               d3.select("#tooltip").style({
+                   visibility: "hidden"
+               })
+           })
     }
     
     
