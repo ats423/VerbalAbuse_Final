@@ -103,7 +103,7 @@ for county in County_pop['features']:
 us_cc = {'type':"FeatureCollection","features":[]}
 cc = 0
 for county in County_pop['features']:
-    us_cc['features'].append({'type':'Feature','id':str(cc),'geometry':{'type':'Point','coordinates':county['centroid']},'properties':{'name':county['county'],'population':county['population'],'twtDensity':county['twtDensity']}}) # 'count':county['count']
+    us_cc['features'].append({'type':'Feature','id':str(cc),'geometry':{'type':'Point','coordinates':county['centroid']},'properties':{'name':county['county'],'state':county['state'],'population':county['population'],'twtDensity':county['twtDensity']}}) # 'count':county['count']
     cc += 1      
 with open('./input_files/twtDensity-counties.json', 'w') as fp:
    json.dump(us_cc, fp) 
