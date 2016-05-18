@@ -145,7 +145,7 @@
 
           
     var scale = d3.scale.sqrt()
-        .range([0,3000000000000000000000000000000000000000000000000000000000])
+        .range([0,50])
         .domain([0,100]);
     
     var data;
@@ -484,31 +484,7 @@
                         .attr("class","land")
                         .attr("d",path);
         
-<<<<<<< HEAD
-       svg.selectAll(".symbol")
-           .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }))
-           .enter().append("path")
-           .attr("class", "symbol")
-           .attr("d", path.pointRadius(function(d) {
-                console.log(d.properties.twtDensity);
-                return scale(d.properties.twtDensity[word]); })) // change to twtDensity
-           .on("mouseenter",function(d,i){
-               console.log(d.properties)
-               highlight(d.properties.name);
-               d3.select("#tooltip").style({
-                   visibility: "visible",
-                   top: (d3.event.clientY)+"px",
-                   left: (d3.event.clientX)+"px",
-                   opacity: 1
-               }).text(d.properties.name + ":" + d.properties.twtDensity[word]+'%')
-           })
-           .on("mouseleave",function(d,i){
-               unHighlight();
-               d3.select("#tooltip").style({
-                   visibility: "hidden"
-               })
-           })
-=======
+
        var symbol = svg.selectAll(".symbol")
                        .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }))
                        .enter().append("path")
@@ -531,7 +507,6 @@
                                visibility: "hidden"
                            })
                        })
->>>>>>> 02c8c2109b7aa58770a67d5c900341d023f0a9a7
     }
     
     
