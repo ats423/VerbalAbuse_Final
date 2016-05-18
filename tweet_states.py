@@ -87,13 +87,13 @@ for st in State['features']:
 # -- Normalizing offensive tweets by population           
 tot_dens = {wrd:0.00 for wrd in County_pop['features'][0]['twtDensity'].keys()}
 for county in County_pop['features']:
-    for wrds in county['twtDensity']:
-        if county['twtDensity'][wrds] != 0.00:
+    if county['twtDensity']['Total'] != 0.00:
+        for wrds in county['twtDensity']:
             county['twtDensity'][wrds] = float(county['twtDensity'][wrds]) / float(county['population'])
             tot_dens[wrds] += county['twtDensity'][wrds]
 for county in County_pop['features']:
-    for wrds in county['twtDensity']:
-        if tot_dens[wrds] != 0.:
+    if tot_dens[wrds] != 0.:
+        for wrds in county['twtDensity']:
             county[wrds] = int(100.00*county['twtDensity'][wrds] / tot_dens[wrds])
 
 
