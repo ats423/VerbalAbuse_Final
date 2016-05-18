@@ -257,10 +257,10 @@
     
             console.log(d3.select('#yaxis1'));
             d3.select('#yaxis1')
-                //.selectAll('.tick.major')
+                .selectAll('.tick')
                 .on('click',clickMe);
 
-            function clickMe(){alert("I've been clicked!")};
+            function clickMe(d){alert(hashtags[d])};
 
         })
 
