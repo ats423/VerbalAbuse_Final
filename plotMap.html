@@ -4,7 +4,9 @@
     
     <title> Tweets US </title>
     <style>
-
+    body {
+        font-family:"Lucida Grande","Droid Sans",Arial,Helvetica,sans-serif;
+    }
     .symbol {
         fill: steelblue;
         fill-opacity: .8;
@@ -56,6 +58,12 @@
 	#xaxis text, #yaxis text {
 		font-size: 12px;
     }
+        
+    .wordsList{
+        list-style: none;
+        padding: 10px;
+        float: left
+    }    
     </style>
 </head>
 
@@ -67,9 +75,18 @@
     </div>
     <div id="tooltip"> Tooltip </div>
     <div id="wrapper"> 
-        <g id="hist1"></g>
-        <g id="hist2"></g>
-        <g id="hist3"></g>
+        <g id="hist1">
+        </g>
+        <g id="hist2">
+        </g>
+        <g id="hist3">
+        </g>
+        
+    </div>
+    
+
+    <div>
+        <ul class="wordsList" id = "wordsList"></ul> 
     </div>
     
     <div id="mapWrapper" preserveAspectRatio = "xMidYMid meet" viewbox = "0 0 500 200" width = 400 height = 300> 
@@ -108,7 +125,12 @@
     
     var data;
     
-    var wordSelect = "Total"
+    var word = "Total"
+    
+    var list = d3.select("#wordsList")
+            .attr("width", width)
+            .attr("height", height);
+    
     
     // READ TWEET COUNTS FOR KEYWORDS    
 
@@ -120,13 +142,13 @@
             });
         for(var i=0; i<totfrequency.length;i++) totfrequency[i] = +totfrequency[i]/1;
     
-        console.log(insults)
-        console.log(totfrequency)
+        //console.log(insults)
+        //console.log(totfrequency)
         function max(num){
             return Math.max.apply(null, num);
         }
         
-        console.log();
+        //console.log();
         var xscale = d3.scale.linear()
                         .domain([0,max(totfrequency)])
                         .range([0,150]);
@@ -137,8 +159,8 @@
 
         var canvas1 = d3.select('#hist1')
                         .append('svg')
-                        .attr({'width':200,'height':250});
-
+                        .attr({'width':200,'height':350});
+        
 
         var	yAxis = d3.svg.axis();
             yAxis
@@ -182,13 +204,13 @@
                 });
             for(var i=0; i<hashfreq.length;i++) hashfreq[i] = +hashfreq[i]/1;
         
-            console.log(hashtags)
-            console.log(hashfreq)
+            //console.log(hashtags)
+            //console.log(hashfreq)
             function max(num){
                 return Math.max.apply(null, num);
             }
             
-            console.log();
+            //console.log();
             var xscale = d3.scale.linear()
                             .domain([0,max(hashfreq)])
                             .range([0,150]);
@@ -199,7 +221,7 @@
 
             var canvas2 = d3.select('#hist2')
                             .append('svg')
-                            .attr({'width':200,'height':250})
+                            .attr({'width':300,'height':350})
 
 
             var	yAxis = d3.svg.axis();
@@ -212,20 +234,16 @@
 
             var y_xis = canvas2.append('g')
                               .attr("transform", "translate(150,20)")
-                              .attr('id','yaxis')
+                              .attr('id','yaxis1')
                               .call(yAxis);
 
             var chart = canvas2.append('g')
                                 .attr("transform", "translate(150,5)")
                                 .attr('id','bars')
                                 .selectAll('rect')
-                                //.attr("transform", "translate(450,50)")
                                 .data(hashfreq)
                                 .enter()
                                 .append('rect')
-                                //.attr("x",450)
-                                //.attr("y",300)
-                                //.attr("transform", "translate(150,50)")
                                 .attr('height',5)
                                 .attr({'x':0,'y':function(d,i){ return yscale(i)+14; }})
                                 .attr('width',function(d){ return 0; });
@@ -236,7 +254,14 @@
                                 .transition()
                                 .duration(1000) 
                                 .attr("width", function(d) {return xscale(d);});
-            
+    
+            console.log(d3.select('#yaxis1'));
+            d3.select('#yaxis1')
+                //.selectAll('.tick.major')
+                .on('click',clickMe);
+
+            function clickMe(){alert("I've been clicked!")};
+
         })
 
     // READ TWEETS FOR MENTIONS 
@@ -248,13 +273,13 @@
                 });
             for(var i=0; i<mentfreq.length;i++) mentfreq[i] = +mentfreq[i]/1;
         
-            console.log(mentions)
-            console.log(mentfreq)
+            //console.log(mentions)
+            //console.log(mentfreq)
             function max(num){
                 return Math.max.apply(null, num);
             }
             
-            console.log();
+            //console.log();
             var xscale = d3.scale.linear()
                             .domain([0,max(mentfreq)])
                             .range([0,150]);
@@ -265,7 +290,7 @@
 
             var canvas3 = d3.select('#hist3')
                             .append('svg')
-                            .attr({'width':300,'height':250})
+                            .attr({'width':450,'height':350})
 
 
             var yAxis = d3.svg.axis();
@@ -275,12 +300,14 @@
                     .tickSize(2)
                     .tickFormat(function(d,i){ return mentions[i]; })
                     .tickValues(d3.range(mentions.length));
-
+        
+            svg.select(".y.axis").on("click", function() { console.log("click!");});
+            
             var y_xis = canvas3.append('g')
-                              .attr("transform", "translate(250,20)")
-                              .attr('id','yaxis')
-                              .call(yAxis);
-
+                            .attr("transform", "translate(250,20)")
+                            .attr('id','yaxis')
+                            .call(yAxis);
+        
             var chart = canvas3.append('g')
                                 .attr("transform", "translate(250,5)")
                                 .attr('id','bars')
@@ -307,6 +334,22 @@
 
 
     
+        // READ TWEETS FOR CO OCCURRING WORDS
+    d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount-words.json",function(error, result){
+            data = result; 
+            var cowords = Object.keys(data);
+            var selection = list.selectAll("li")
+                .data(cowords,function(cowords){return cowords});
+            //console.log(cowords)
+            selection.enter()
+                .append("li")
+                .attr("class","listItem")
+                .text(function(cowrods,i){ return cowords[i]; })
+            
+            
+            
+        })
+    
 
     // Useful functions
     function highlight(name){
@@ -327,10 +370,12 @@
         .defer(d3.json, "https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/us-states.json")
         .defer(d3.json,  "https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtDensity-counties.json") // "us-state-centroids.json")
         .defer(d3.json,  "https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount.json") // "us-state-centroids.json")
-        .await(ready);
+        .await(plotMap);
+    
+
     
     // RENDERING MAP
-    function ready(error, us, centroid, keywords) {
+    function plotMap(error, us, centroid, keywords) {
       if (error) throw error;   
 //        
             
@@ -363,7 +408,7 @@
             .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }))
             .enter().append("path")
             .attr("class", "symbol")
-            .attr("d", path.pointRadius(function(d) {return scale(d.properties.twtDensity); })) // change to twtDensity
+            .attr("d", path.pointRadius(function(d) {return scale(d.properties.twtDensity[word]); })) // change to twtDensity
             .on("mouseenter",function(d,i){
                 //console.log(d.properties)
                 highlight(d.properties.name);
@@ -372,7 +417,7 @@
                     top: (d3.event.clientY)+"px",
                     left: (d3.event.clientX)+"px",
                     opacity: 1
-                }).text(d.properties.name + ":" + d.properties.twtDensity+'%')
+                }).text(d.properties.name + ":" + d.properties.twtDensity[word]+'%')
             })
             .on("mouseleave",function(d,i){
                 unHighlight();
@@ -381,4 +426,7 @@
                 })
             })
     }
+    
+    
+    
 </script>
