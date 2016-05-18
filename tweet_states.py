@@ -88,13 +88,15 @@ for st in State['features']:
 tot_dens = {wrd:0.00 for wrd in County_pop['features'][0]['twtDensity'].keys()}
 for county in County_pop['features']:
     if county['twtDensity']['Total'] != 0.00:
-        for wrds in county['twtDensity']:
-            county['twtDensity'][wrds] = float(county['twtDensity'][wrds]) / float(county['population'])
-            tot_dens[wrds] += county['twtDensity'][wrds]
+        for wrds,counts in county['twtDensity'].iteritems():
+            if counts != 0.:
+                county['twtDensity'][wrds] = float(counts) / float(county['population'])
+                tot_dens[wrds] += county['twtDensity'][wrds]
 for county in County_pop['features']:
-    if tot_dens[wrds] != 0.:
-        for wrds in county['twtDensity']:
-            county[wrds] = int(100.00*county['twtDensity'][wrds] / tot_dens[wrds])
+    for wrds in county['twtDensity']:
+        if tot_dens[wrds] != 0.:     
+            if county['twtDensity'][wrds] != 0.0:                
+                county['twtDensity'][wrds] = int(100.00*county['twtDensity'][wrds] / float(tot_dens[wrds]))
 
 
 # -- Filling out and saving a dictionary to read from d3.   
