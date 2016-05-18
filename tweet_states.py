@@ -55,13 +55,17 @@ for twt in Tweets:
                     for c in County_pop['features']:
                         if c['county']==county['name']+" County" and c['state']==st['properties']['state']:
                             c['twtDensity']['Total'] += 1.
-                            for mention in mention_list.keys():
-                                if twt['entities']['user_mentions'] == mention:
-                                    c['twtDensity'][mention] += 1
-                            for hashtag in hashtag_list.keys():
-                                if twt['entities']['hashtags'] == hashtag:
-                                    c['twtDensity'][hashtag] += 1
-                                #twt['entities']['user_mentions']
+                            if twt['entities']['user_mentions']:
+                                for mt in twt['entities']['user_mentions']:
+                                    for mention in mention_list.keys():
+                                        if '@'+str(mt['screen_name']) == mention:
+                                            c['twtDensity'][mention] += 1
+                            if twt['entities']['hashtags']:
+                                for ht in twt['entities']['hashtags']:
+                                    for hashtag in hashtag_list.keys():
+                                        if '#'+str(ht['text']) == hashtag:
+                                            c['twtDensity'][hashtag] += 1
+                                    #twt['entities']['user_mentions']
                             
                 
 
