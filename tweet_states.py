@@ -88,8 +88,9 @@ for st in State['features']:
 tot_dens = {wrd:0.00 for wrd in County_pop['features'][0]['twtDensity'].keys()}
 for county in County_pop['features']:
     for wrds in county['twtDensity']:
-        county['twtDensity'][wrds] = float(county['twtDensity'][wrds]) / float(county['population'])
-        tot_dens[wrds] += county['twtDensity'][wrds]
+        if county['twtDensity'][wrds] != 0.00:
+            county['twtDensity'][wrds] = float(county['twtDensity'][wrds]) / float(county['population'])
+            tot_dens[wrds] += county['twtDensity'][wrds]
 for county in County_pop['features']:
     for wrds in county['twtDensity']:
         if tot_dens[wrds] != 0.:
