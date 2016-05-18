@@ -15,7 +15,8 @@ from shapely.geometry import Polygon
 Tweets = geojson.loads(open('./input_files/Tweets_Geolocation.json').read()) # input Twitter data
 State = geojson.loads(open('./input_files/us-counties.json').read()) # geometries and names of counties
 County_pop = json.loads(open('./input_files/county-pop-FIPS-dict.json').read()) # counties with population
-
+mention_list = json.loads(open('./input_files/twtCount-mentions.json').read()) # List and counts of mentions
+hashtag_list = json.loads(open('./input_files/twtCount-hashtags.json').read()) # List and counts of hashtags
 
 # -- Function to know if a point is inside a polygon. From http://www.ariel.com.au/a/python-point-int-poly.html
 def point_inside_polygon(x,y,poly):
@@ -37,8 +38,12 @@ def point_inside_polygon(x,y,poly):
 
 # -- Assigning a count of tweets per county where there was a tweet.
 for county in County_pop['features']:
-    county['count'] = 0. 
+    county['twtDensity'] = {'Total':0.}
     county['centroid'] = []
+    for mention in mention_list.keys():
+        county['twtDensity'].update({mention: 0.})
+    for hashtag in hashtag_list.keys():
+        county['twtDensity'].update({hashtag: 0.})
 for twt in Tweets:
     x = twt['coordinates']['coordinates'][0]
     y = twt['coordinates']['coordinates'][1]
@@ -49,7 +54,15 @@ for twt in Tweets:
                 if point_inside_polygon(x,y,poly):
                     for c in County_pop['features']:
                         if c['county']==county['name']+" County" and c['state']==st['properties']['state']:
-                            c['count'] += 1.
+                            c['twtDensity']['Total'] += 1.
+                            for mention in mention_list.keys():
+                                if twt['entities']['user_mentions'] == mention:
+                                    c['twtDensity'][mention] += 1
+                            for hashtag in hashtag_list.keys():
+                                if twt['entities']['hashtags'] == hashtag:
+                                    c['twtDensity'][hashtag] += 1
+                                #twt['entities']['user_mentions']
+                            
                 
 
 # -- Creating a field for the geometry (centroid) of each county          
@@ -68,19 +81,22 @@ for st in State['features']:
           
           
 # -- Normalizing offensive tweets by population           
-tot_dens = 0.00
+tot_dens = {wrd:0.00 for wrd in County_pop['features'][0]['twtDensity'].keys()}
 for county in County_pop['features']:
-    county['twtDensity'] = float(county['count']) / float(county['population'])
-    tot_dens += county['twtDensity']
+    for wrds in county['twtDensity']:
+        county['twtDensity'][wrds] = float(county['twtDensity'][wrds]) / float(county['population'])
+        tot_dens[wrds] += county['twtDensity'][wrds]
 for county in County_pop['features']:
-  county['twtDensity'] = int(100.00*county['twtDensity'] / tot_dens)
+    for wrds in county['twtDensity']:
+        if tot_dens[wrds] != 0.:
+            county[wrds] = int(100.00*county['twtDensity'][wrds] / tot_dens[wrds])
 
 
 # -- Filling out and saving a dictionary to read from d3.   
 us_cc = {'type':"FeatureCollection","features":[]}
 cc = 0
 for county in County_pop['features']:
-    us_cc['features'].append({'type':'Feature','id':str(cc),'geometry':{'type':'Point','coordinates':county['centroid']},'properties':{'name':county['county'],'count':county['count'],'population':county['population'],'twtDensity':county['twtDensity']}}) 
+    us_cc['features'].append({'type':'Feature','id':str(cc),'geometry':{'type':'Point','coordinates':county['centroid']},'properties':{'name':county['county'],'population':county['population'],'twtDensity':county['twtDensity']}}) # 'count':county['count']
     cc += 1      
 with open('./input_files/twtDensity-counties.json', 'w') as fp:
    json.dump(us_cc, fp) 
