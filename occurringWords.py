@@ -20,7 +20,7 @@ for twt in Tweets:
     #print twt['text']
     for wrd in twt['text'].strip().split(' '):
         txt = wrd.strip().split('.')[0]
-        if txt != 'https://t' and txt not in stop_words and txt not in keywords:
+        if txt.lower() != 'https://t' and txt.lower() not in stop_words and txt.lower() not in keywords:
             #.strip().split('@')[-1:]
             #print txt (?<=^|(?<=[^a-zA-Z0-9-_\.]))@([A-Za-z]+[A-Za-z0-9]+)
             

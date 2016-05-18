@@ -424,10 +424,7 @@
             selection.enter()
                 .append("li")
                 .attr("class","listItem")
-                .text(function(cowrods,i){ return cowords[i]; })
-            
-            
-            
+                .text(function(cowrods,i){ return cowords[i]; })  
         })
     };
 
@@ -462,53 +459,53 @@
       if (error) throw error;   
         console.log(word);
         
-        svg.append("path",".graticule")
-            .style("width", "100%")
-            //.style("height", height)
-            .attr("class", "counties")
-            //.attr("transform","translate(300,-100)")
-            .datum(topojson.feature(us, us.objects.counties))
-            //.datum(topojson.mesh(us, us.objects.counties,function(a,b) {return a !== b &&  !(a.id/1000 ^ b.id /1000); }))
-            .attr("d", path);
+        var counties = svg.append("path",".graticule")
+                            .style("width", "100%")
+                            //.style("height", height)
+                            .attr("class", "counties")
+                            //.attr("transform","translate(300,-100)")
+                            .datum(topojson.feature(us, us.objects.counties))
+                            //.datum(topojson.mesh(us, us.objects.counties,function(a,b) {return a !== b &&  !(a.id/1000 ^ b.id /1000); }))
+                            .attr("d", path);
         
-        svg.append("path",".graticule")
-            .style("width", "100%")
-            //.style("width", width)
-            //.style("height", height)
-            .datum(topojson.mesh(us,us.objects.states, function(a,b){return a!==b;}))
-            .attr("class","state-boundary")
-            .attr("d",path);
+        var state_boundary = svg.append("path",".graticule")
+                                .style("width", "100%")
+                                //.style("width", width)
+                                //.style("height", height)
+                                .datum(topojson.mesh(us,us.objects.states, function(a,b){return a!==b;}))
+                                .attr("class","state-boundary")
+                                .attr("d",path);
         
-        svg.append("path",".graticule")
-            .style("width", "100%")
-            //.style("width", width)
-            //.style("height", height)
-            .datum(topojson.feature(us,us.objects.land))
-            .attr("class","land")
-            .attr("d",path);
+        var land = svg.append("path",".graticule")
+                        .style("width", "100%")
+                        //.style("width", width)
+                        //.style("height", height)
+                        .datum(topojson.feature(us,us.objects.land))
+                        .attr("class","land")
+                        .attr("d",path);
         
-       svg.selectAll(".symbol")
-           .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }))
-           .enter().append("path")
-           .attr("class", "symbol")
-           .attr("d", path.pointRadius(function(d) {
-               return scale(d.properties.twtDensity[word]); })) // change to twtDensity
-           .on("mouseenter",function(d,i){
-               console.log(d.properties)
-               highlight(d.properties.name);
-               d3.select("#tooltip").style({
-                   visibility: "visible",
-                   top: (d3.event.clientY)+"px",
-                   left: (d3.event.clientX)+"px",
-                   opacity: 1
-               }).text(d.properties.name + ":" + d.properties.twtDensity[word]+'%')
-           })
-           .on("mouseleave",function(d,i){
-               unHighlight();
-               d3.select("#tooltip").style({
-                   visibility: "hidden"
-               })
-           })
+       var symbol = svg.selectAll(".symbol")
+                       .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }))
+                       .enter().append("path")
+                       .attr("class", "symbol")
+                       .attr("d", path.pointRadius(function(d) {
+                           return scale(d.properties.twtDensity[word]); })) // change to twtDensity
+                       .on("mouseenter",function(d,i){
+                           console.log(d.properties)
+                           highlight(d.properties.name);
+                           d3.select("#tooltip").style({
+                               visibility: "visible",
+                               top: (d3.event.clientY)+"px",
+                               left: (d3.event.clientX)+"px",
+                               opacity: 1
+                           }).text(d.properties.name + ":" + d.properties.twtDensity[word]+'%')
+                       })
+                       .on("mouseleave",function(d,i){
+                           unHighlight();
+                           d3.select("#tooltip").style({
+                               visibility: "hidden"
+                           })
+                       })
     }
     
     
