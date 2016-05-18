@@ -1,4 +1,5 @@
 import json
+import operator
 
 #Reading in the json file with tweets
 json_data=open('./input_files/Tweets_Geolocation.json').read()
@@ -39,7 +40,12 @@ for key in hashtags.iterkeys():
 
 
 print sum(hashtags.itervalues())
-
-with open('./input_files/twtCount-hashtags.json', 'w') as fp:
-    json.dump(hashtags, fp) 
+    
+    
+if len(hashtags.keys())>10:
+    with open('./input_files/twtCount-hashtags.json', 'w') as fp:
+        json.dump(dict( sorted(hashtags.items(), key=operator.itemgetter(1))[-11:]), fp)
+else:
+    with open('./input_files/twtCount-hashtags.json', 'w') as fp:
+        json.dump(hashtags, fp)
 #print hashtags

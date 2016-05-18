@@ -1,4 +1,5 @@
 import json
+import operator
 
 #Reading in the json file with tweets
 json_data=open('./input_files/Tweets_Geolocation.json').read()
@@ -63,6 +64,10 @@ print sum(usernames.itervalues())
 #print usernames
 print sum(realnames.itervalues())
 #print realnames
-
-with open('./input_files/twtCount-mentions.json', 'w') as fp:
-   json.dump(usernames, fp) 
+   
+if len(usernames.keys())>10:
+    with open('./input_files/twtCount-mentions.json', 'w') as fp:
+        json.dump(dict( sorted(usernames.items(), key=operator.itemgetter(1))[-11:]), fp)
+else:
+    with open('./input_files/twtCount-mentions.json', 'w') as fp:
+        json.dump(usernames, fp)
