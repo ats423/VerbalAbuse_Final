@@ -1,7 +1,7 @@
 import json
 
 #Reading in the json file with tweets
-json_data=open('./input_files/15_Keywords_Merged.json').read()
+json_data=open('./input_files/Coordinates_15Keywords_Works.json').read()
 Tweets = json.loads(json_data)
 
 #Initializing a dictionary with keywords used for queries

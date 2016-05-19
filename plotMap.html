@@ -114,6 +114,7 @@
             <!-- <h2>Frequency of various abusive words</h2> -->
         </g>
         <g id="hist2">
+            
             <!-- <h2>Frequency of hashtags used with the words</h2> -->
         </g>
         <g id="hist3">
@@ -145,7 +146,7 @@
 
     
     var projection = d3.geo.albersUsa()
-        .scale(800);
+        .scale(1000);
     
     var path = d3.geo.path()
         .projection(projection);
@@ -323,23 +324,8 @@
 
                 function clickMe(d){
                     alert(hashtags[d]);
-                    
-                    
-                    d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/us-states.json",function(error,result){
-                        us = result;
-                        d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtDensity-counties.json",function(error,result){
-                            centroid = result;
-                            d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount.json",function(error,result){
-                                keywords = result;
-                                console.log(us);
-                                console.log(centroid);
-                                console.log(keywords);
-                                
-                                svg.selectAll("*").remove();
-                                plotMap(error,us,centroid,keywords);
-                            })
-                            })
-                        })
+                    word = hashtags[d];        
+                    renderMap();
                     };
                     //console.log(word)};
 
@@ -384,7 +370,6 @@
                         .tickFormat(function(d,i){ return mentions[i]; })
                         .tickValues(d3.range(mentions.length));
 
-                svg.select(".y.axis").on("click", function() { console.log("click!");});
 
                 var y_xis = canvas3.append('g')
                                 .attr("transform", "translate(200,20)")
@@ -455,6 +440,8 @@
     };
     
     
+    function renderMap(){ 
+    
     // Read source files
     queue()
         .defer(d3.json, "https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/us-states.json")
@@ -462,15 +449,12 @@
         .defer(d3.json,  "https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount.json") // "us-state-centroids.json")
         .await(plotMap);
     
-    renderKeywords();
-    renderHashtags();
-    renderMentions();
-    renderWords();
-    
     // RENDERING MAP
     function plotMap(error, us, centroid, keywords) {
+        console.log(us);
+        console.log(centroid);
       if (error) throw error;   
-        console.log(word);
+        //console.log(word);
         
         var counties = svg.append("path",".graticule")
                             .style("width", "100%")
@@ -498,28 +482,49 @@
                         .attr("d",path);
         
        var symbol = svg.selectAll(".symbol")
-                       .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }))
-                       .enter().append("path")
-                       .attr("class", "symbol")
-                       .attr("d", path.pointRadius(function(d) {
-                           return scale(d.properties.twtDensity[word]); })) // change to twtDensity
-                       .on("mouseenter",function(d,i){
-                           console.log(d)
-                           highlight(d.properties.name);
-                           d3.select("#tooltip").style({
-                               visibility: "visible",
-                               top: (d3.event.clientY)+"px",
-                               left: (d3.event.clientX)+"px",
-                               opacity: 1
-                           }).text(d.properties.name + ',' + d.properties.state + ":" + d.properties.twtDensity[word]+'%')
-                       })
-                       .on("mouseleave",function(d,i){
-                           unHighlight();
-                           d3.select("#tooltip").style({
-                               visibility: "hidden"
-                           })
-                       })
-    }
+                       .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }));
+       
+       symbol
+           .enter().append("path")
+            .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }))
+           .attr("class", "symbol")
+           .attr("d", path.pointRadius(function(d) {
+                    //console.log(d)
+                    return scale(d.properties.twtDensity[word]);} ))
+           .on("mouseenter",function(d,i){
+                //console.log(d)
+                highlight(d.properties.name);
+                d3.select("#tooltip").style({
+                    visibility: "visible",
+                    top: (d3.event.clientY)+"px",
+                    left: (d3.event.clientX)+"px",
+                    opacity: 1
+                }).text(d.properties.name + ',' + d.properties.state + ":" + d.properties.twtDensity[word]+'%')})
+               .on("mouseleave",function(d,i){
+                   unHighlight();
+                   d3.select("#tooltip").style({
+                       visibility: "hidden"
+                   })
+                });
+        
+        symbol.exit().remove();
+        
+//        symbol.transition()
+//            .attr("d", path.pointRadius(function(d) {
+//                console.log(d)
+//                return scale(d.properties.twtDensity[word]); 
+//            }));
+
+    };
+       
+    };
+    
+    
+    renderMap();
+    renderKeywords();
+    renderHashtags();
+    renderMentions();
+    renderWords();
     
     
     

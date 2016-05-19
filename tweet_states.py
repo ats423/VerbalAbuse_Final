@@ -12,7 +12,7 @@ from shapely.geometry import Polygon
 
 
 # -- Input data and input geometries
-Tweets = geojson.loads(open('./input_files/Tweets_Geolocation.json').read()) # input Twitter data
+Tweets = geojson.loads(open('./input_files/Coordinates_15Keywords_Works.json').read()) # input Twitter data
 State = geojson.loads(open('./input_files/us-counties.json').read()) # geometries and names of counties
 County_pop = json.loads(open('./input_files/county-pop-FIPS-dict.json').read()) # counties with population
 mention_list = json.loads(open('./input_files/twtCount-mentions.json').read()) # List and counts of mentions
@@ -45,30 +45,32 @@ for county in County_pop['features']:
     for hashtag in hashtag_list.keys():
         county['twtDensity'].update({hashtag: 0.})
 for twt in Tweets:
-    x = twt['coordinates']['coordinates'][0]
-    y = twt['coordinates']['coordinates'][1]
-    for st in State['features']:
-        for county in st['counties']:
-            poly = county['geometry']['coordinates'][0]
-            if len(np.shape(np.array(poly))) == 2:
-                if point_inside_polygon(x,y,poly):
-                    for c in County_pop['features']:
-                        if c['county']==county['name']+" County" and c['state']==st['properties']['state']:
-                            c['twtDensity']['Total'] += 1.
-                            if twt['entities']['user_mentions']:
-                                for mt in twt['entities']['user_mentions']:
-                                    for mention in mention_list.keys():
-                                        if '@'+str(mt['screen_name']) == mention:
-                                            c['twtDensity'][mention] += 1
-                            if twt['entities']['hashtags']:
-                                for ht in twt['entities']['hashtags']:
-                                    for hashtag in hashtag_list.keys():
-                                        if '#'+str(ht['text']) == hashtag:
-                                            c['twtDensity'][hashtag] += 1
-                                    #twt['entities']['user_mentions']
-                            
+    try:  
+        x = twt['geo']['coordinates'][0]
+        y = twt['geo']['coordinates'][1]
+        for st in State['features']:
+            for county in st['counties']:
+                poly = county['geometry']['coordinates'][0]
+                if len(np.shape(np.array(poly))) == 2:
+                    if point_inside_polygon(x,y,poly):
+                        for c in County_pop['features']:
+                            if c['county']==county['name']+" County" and c['state']==st['properties']['state']:
+                                c['twtDensity']['Total'] += 1.
+                                if twt['entities']['user_mentions']:
+                                    for mt in twt['entities']['user_mentions']:
+                                        for mention in mention_list.keys():
+                                            if '@'+str(mt['screen_name']) == mention:
+                                                c['twtDensity'][mention] += 1
+                                if twt['entities']['hashtags']:
+                                    for ht in twt['entities']['hashtags']:
+                                        for hashtag in hashtag_list.keys():
+                                            if '#'+str(ht['text']) == hashtag:
+                                                c['twtDensity'][hashtag] += 1
+                                        #twt['entities']['user_mentions']
                 
-
+    except  TypeError:
+        print twt
+        continue
 # -- Creating a field for the geometry (centroid) of each county          
 for st in State['features']:
     for county in st['counties']:

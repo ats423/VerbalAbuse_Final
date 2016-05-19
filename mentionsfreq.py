@@ -1,7 +1,7 @@
 import json
 import operator
 #Reading in the json file with tweets
-json_data=open('./input_files/Tweets_Geolocation.json').read()
+json_data=open('./input_files/Coordinates_15Keywords_Works.json').read()
 Tweets = json.loads(json_data)
 
 #users = []

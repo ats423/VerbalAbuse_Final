@@ -9,7 +9,7 @@ import json
 import re
 
 # Loading tweets and list of English stop words
-Tweets = json.loads(open('./input_files/Tweets_Geolocation.json').read())
+Tweets = json.loads(open('./input_files/Coordinates_15Keywords_Works.json').read())
 stop_words = json.loads(open('./input_files/en.json').read())
 keywords = dict.fromkeys(['Lesbo', 'Dyke', 'Whore', 'Bitch', 
 	'Fag', 'Slut', 'Cunt', 'Faggot', 'Bimbo', 'Fatso', 'Floozy',
