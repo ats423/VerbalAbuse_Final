@@ -125,7 +125,7 @@
     
 
     <div>
-        <h2> Words that often co-occur with abusive words</h2>
+        <h2> Words that often co-occurred with abusive words</h2>
         <ul class="wordsList" id = "wordsList"></ul> 
     </div>
     
@@ -169,7 +169,8 @@
     
     var list = d3.select("#wordsList")
             .attr("width", width)
-            .attr("height", height);
+            .attr("height", height)
+            .attr("transform","translate(500,500)");
     
     
     // READ TWEET COUNTS FOR KEYWORDS    
@@ -195,7 +196,7 @@
 
             var yscale = d3.scale.linear()
                             .domain([0,insults.length])
-                            .range([0,150]);
+                            .range([0,200]);
 
             var canvas1 = d3.select('#hist1')
                             .append('svg')
@@ -222,7 +223,7 @@
                                 .data(totfrequency)
                                 .enter()
                                 .append('rect')
-                                .attr('height',5)
+                                .attr('height',8)
                                 .attr({'x':0,'y':function(d,i){ return yscale(i)+14; }})
                                 .attr('width',function(d){ return 0; });
 
@@ -270,7 +271,7 @@
 
                 var yscale = d3.scale.linear()
                                 .domain([0,hashtags.length])
-                                .range([0,100]);
+                                .range([0,180]);
 
                 var canvas2 = d3.select('#hist2')
                                 .append('svg')
@@ -296,7 +297,7 @@
                                     .data(hashfreq)
                                     .enter()
                                     .append('rect')
-                                    .attr('height',5)
+                                    .attr('height',8)
                                     .attr({'x':0,'y':function(d,i){ return yscale(i)+14; }})
                                     .attr('width',function(d){ return 0; });
 
@@ -355,7 +356,7 @@
 
                 var yscale = d3.scale.linear()
                                 .domain([0,mentions.length])
-                                .range([0,100]);
+                                .range([0,150]);
 
                 var canvas3 = d3.select('#hist3')
                                 .append('svg')
@@ -387,7 +388,7 @@
                                     //.attr("x",450)
                                     //.attr("y",300)
                                     //.attr("transform", "translate(150,50)")
-                                    .attr('height',5)
+                                    .attr('height',7)
                                     .attr({'x':0,'y':function(d,i){ return yscale(i)+14; }})
                                     .attr('width',function(d){ return 0; });
 
@@ -446,7 +447,7 @@
     queue()
         .defer(d3.json, "https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/us-states.json")
         .defer(d3.json,  "https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtDensity-counties.json") // "us-state-centroids.json")
-        .defer(d3.json,  "https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount.json") // "us-state-centroids.json")
+        .defer(d3.json,  "https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount.json") //s-state-centroids.json")
         .await(plotMap);
     
     // RENDERING MAP
@@ -483,11 +484,18 @@
         
        var symbol = svg.selectAll(".symbol")
                        .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }));
+        
+       symbol.exit().remove();
+        
+//       var symbol2 = svg.selectAll("path")
+//                       .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }));
+        
        
        symbol
            .enter().append("path")
-            .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }))
            .attr("class", "symbol")
+       
+       symbol
            .attr("d", path.pointRadius(function(d) {
                     //console.log(d)
                     return scale(d.properties.twtDensity[word]);} ))
@@ -500,16 +508,15 @@
                     left: (d3.event.clientX)+"px",
                     opacity: 1
                 }).text(d.properties.name + ',' + d.properties.state + ":" + d.properties.twtDensity[word]+'%')})
-               .on("mouseleave",function(d,i){
-                   unHighlight();
-                   d3.select("#tooltip").style({
-                       visibility: "hidden"
-                   })
-                });
+           .on("mouseleave",function(d,i){
+               unHighlight();
+               d3.select("#tooltip").style({
+                   visibility: "hidden"
+               })
+            });
         
-        symbol.exit().remove();
         
-//        symbol.transition()
+//        symbol2.transition()
 //            .attr("d", path.pointRadius(function(d) {
 //                console.log(d)
 //                return scale(d.properties.twtDensity[word]); 
