@@ -10,7 +10,6 @@ import geojson
 import numpy as np
 from shapely.geometry import Polygon
 
-
 # -- Input data and input geometries
 Tweets = geojson.loads(open('./input_files/Coordinates_15Keywords_Works.json').read()) # input Twitter data
 State = geojson.loads(open('./input_files/us-counties.json').read()) # geometries and names of counties
@@ -46,13 +45,16 @@ for county in County_pop['features']:
         county['twtDensity'].update({hashtag: 0.})
 for twt in Tweets:
     try:  
-        x = twt['geo']['coordinates'][0]
-        y = twt['geo']['coordinates'][1]
+        y = twt['geo']['coordinates'][0]
+        x = twt['geo']['coordinates'][1]
+        #x= twt['coordinates']['coordinates'][0]
+        #y= twt['coordinates']['coordinates'][1]
         for st in State['features']:
             for county in st['counties']:
                 poly = county['geometry']['coordinates'][0]
                 if len(np.shape(np.array(poly))) == 2:
                     if point_inside_polygon(x,y,poly):
+                        #print "At least something is happening"
                         for c in County_pop['features']:
                             if c['county']==county['name']+" County" and c['state']==st['properties']['state']:
                                 c['twtDensity']['Total'] += 1.
