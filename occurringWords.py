@@ -14,13 +14,15 @@ stop_words = json.loads(open('./input_files/en.json').read())
 keywords = dict.fromkeys(['Lesbo', 'Dyke', 'Whore', 'Bitch', 
 	'Fag', 'Slut', 'Cunt', 'Faggot', 'Bimbo', 'Fatso', 'Floozy',
 	'Poontang', 'Pussy', 'Twat', 'Wussy'])
+stop_list = map(lambda x: x.lower(),stop_words)
+keywords_list = map(lambda x: x.lower(),keywords.keys())
 
 map_words = {}
 for twt in Tweets:
     #print twt['text']
     for wrd in twt['text'].strip().split(' '):
         txt = wrd.strip().split('.')[0]
-        if txt.lower() != 'https://t' and txt.lower() not in stop_words and txt.lower() not in keywords:
+        if txt.lower() != 'https://t' and txt.lower() not in stop_list and txt.lower() not in keywords_list:
             #.strip().split('@')[-1:]
             #print txt (?<=^|(?<=[^a-zA-Z0-9-_\.]))@([A-Za-z]+[A-Za-z0-9]+)
             
