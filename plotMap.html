@@ -10,6 +10,7 @@
 
     h1 {
         text-align: center;
+        color: #036;
     }
 
     h2 {
@@ -196,7 +197,7 @@
 
             var yscale = d3.scale.linear()
                             .domain([0,insults.length])
-                            .range([0,200]);
+                            .range([0,180]);
 
             var canvas1 = d3.select('#hist1')
                             .append('svg')
@@ -212,12 +213,12 @@
                     .tickValues(d3.range(17));
 
             var y_xis = canvas1.append('g')
-                              .attr("transform", "translate(100,20)")
+                              .attr("transform", "translate(100,25)")
                               .attr('id','yaxis')
                               .call(yAxis);
 
             var chart = canvas1.append('g')
-                                .attr("transform", "translate(100,5)")
+                                .attr("transform", "translate(100,7)")
                                 .attr('id','bars')
                                 .selectAll('rect')
                                 .data(totfrequency)
@@ -243,6 +244,15 @@
                                 .transition()
                                 .duration(1000) 
                                 .attr("width", function(d) {return xscale(d); });
+
+            var transitext = d3.select('#bars')
+                                .selectAll('text')
+                                .data(totfrequency)
+                                .enter()
+                                .append('text')
+                                .attr({'x':0,'y':function(d,i){ return yscale(i)+14; }})
+                                .attr("transform", "translate(7, 7)")
+                                .text(function(d){ return d; }).style({'fill':'#fff','font-size':'7px'});
 
             })
     };
@@ -318,6 +328,15 @@
                                     .duration(1000) 
                                     .attr("width", function(d) {return xscale(d);});
 
+                var transitext = d3.select('#bars')
+                                    .selectAll('text')
+                                    .data(hashfreq)
+                                    .enter()
+                                    .append('text')
+                                    .attr({'x':0,'y':function(d,i){ return yscale(i)+14; }})
+                                    .attr("transform", "translate(28, 7)")
+                                    .text(function(d){ return d; }).style({'fill':'#fff','font-size':'7px'});
+
                 //console.log(d3.select('#yaxis1'));
                 d3.select('#yaxis1')
                     .selectAll('.tick')
@@ -373,12 +392,12 @@
 
 
                 var y_xis = canvas3.append('g')
-                                .attr("transform", "translate(200,20)")
+                                .attr("transform", "translate(200,25)")
                                 .attr('id','yaxis')
                                 .call(yAxis);
 
                 var chart = canvas3.append('g')
-                                    .attr("transform", "translate(200,5)")
+                                    .attr("transform", "translate(200,10)")
                                     .attr('id','bars')
                                     .selectAll('rect')
                                     //.attr("transform", "translate(450,50)")
@@ -400,13 +419,22 @@
                                     .style("font-size", "11px") 
                                     .style("text-decoration", "underline") 
                                     .style("font-weight", "bold") 
-                                    .text("Frequency of users targetted by abusive words");
+                                    .text("Frequency of users mentioned with abusive words");
 
                 var transit = d3.select("#hist3").selectAll("rect")
                                     .data(mentfreq)
                                     .transition()
                                     .duration(1000) 
                                     .attr("width", function(d) {return xscale(d);});
+
+                var transitext = d3.select('#bars')
+                                    .selectAll('text')
+                                    .data(mentfreq)
+                                    .enter()
+                                    .append('text')
+                                    .attr({'x':0,'y':function(d,i){ return yscale(i)+14; }})
+                                    .attr("transform", "translate(14, 7)")
+                                    .text(function(d){ return d; }).style({'fill':'#fff','font-size':'7px'});
 
             })
     };
