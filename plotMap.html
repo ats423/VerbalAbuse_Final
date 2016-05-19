@@ -419,7 +419,7 @@
                                     .style("font-size", "11px") 
                                     .style("text-decoration", "underline") 
                                     .style("font-weight", "bold") 
-                                    .text("Frequency of users mentioned with abusive words");
+                                    .text("Frequency of users mentioned with abusive tweets");
 
                 var transit = d3.select("#hist3").selectAll("rect")
                                     .data(mentfreq)
@@ -435,6 +435,17 @@
                                     .attr({'x':0,'y':function(d,i){ return yscale(i)+14; }})
                                     .attr("transform", "translate(14, 7)")
                                     .text(function(d){ return d; }).style({'fill':'#fff','font-size':'7px'});
+            
+                //console.log(d3.select('#yaxis1'));
+                d3.select('#yaxis')
+                    .selectAll('.tick')
+                    .on('click',clickMe);
+
+                function clickMe(d){
+                    alert(mentions[d]);
+                    word = mentions[d];        
+                    renderMap();
+                    };
 
             })
     };
@@ -513,7 +524,7 @@
        var symbol = svg.selectAll(".symbol")
                        .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }));
         
-       symbol.exit().remove();
+       
         
 //       var symbol2 = svg.selectAll("path")
 //                       .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }));
@@ -543,12 +554,14 @@
                })
             });
         
+        symbol.exit().remove();
         
-//        symbol2.transition()
-//            .attr("d", path.pointRadius(function(d) {
-//                console.log(d)
-//                return scale(d.properties.twtDensity[word]); 
-//            }));
+        symbol.transition()
+            .attr("path", path.pointRadius(function(d) {
+                console.log(d)
+                return scale(d.properties.twtDensity[word]); 
+            }));
+    
 
     };
        
