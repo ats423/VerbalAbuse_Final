@@ -1,7 +1,7 @@
 #Verbal Abuse Against Women on Twitter
 
 
-![alt text](https://raw.githubusercontent.com/CristianFelix/infoviz/master/Screen.png "Screenshot")
+![alt text](https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/Map.png "Screenshot")
 
 
 **Authors**: Neil Verosh D'Souza ([neilverosh](https://github.com/neilverosh)), Sara Arango Franco ([sarangof](https://github.com/sarangof)), Alexandra Teresa Scavelli ([ats423](https://github.com/ats423))
