@@ -7,12 +7,10 @@
     body {
         font-family:"Lucida Grande","Droid Sans",Arial,Helvetica,sans-serif;
     }
-
     h1 {
         text-align: center;
         color: #036;
     }
-
     h2 {
         font-family: arial, sans-serif;
         font-size: 14px;
@@ -26,7 +24,6 @@
         fill-opacity: .8;
         stroke-width = 1px;
     }
-        
     #tooltip {
         position: absolute;
         top: 0;
@@ -38,7 +35,6 @@
         font: 14px sans-serif;
         text-align: center;  
     }
-        
     .counties {
         fill: rgb(242, 242, 242);
         stroke: #999;
@@ -48,7 +44,6 @@
     #wrapper {
         text-align: center;
     }
-
     #mapWrapper{
         margin:2%;
 		padding:10px;
@@ -56,13 +51,11 @@
 		border-radius: 2px; 
         text-align: center
     }
-    
     .state-boundary{
         fill: none;
         stroke: #222;
         text-align: center 
     }
-        
     #title{
         font: 12px sans-serif; 
         color: darkslateblue;
@@ -73,7 +66,6 @@
         stroke: #222;
         text-align: center;
     }
-        
     #xaxis .domain {
 		fill:none;
 		stroke:#000;
@@ -81,16 +73,13 @@
 	#xaxis text, #yaxis text {
 		font-size: 12px;
     }
-        
     .wordsList {
         margin: 0;
         padding: 0;
         list-style-type: none;
         text-align: center;
     }   
-
     .listItem { display: inline; list-style-type: none;}
-
     .listItem {
         list-style-type: none;
         text-decoration: none;
@@ -102,38 +91,26 @@
 
     </style>
 </head>
-
-
 <body >
-
     <div id="title"> 
         <h1> Offensive tweets towards women in the United States during the last 6 hours </h1>
     </div>
     <div id="tooltip"> Tooltip </div>
     <div id="wrapper"> 
         <g id="hist1">
-            <!-- <h2>Frequency of various abusive words</h2> -->
         </g>
         <g id="hist2">
-            
-            <!-- <h2>Frequency of hashtags used with the words</h2> -->
         </g>
         <g id="hist3">
-            <!-- <h2>Frequency of users targetted by abusive words</h2> -->
         </g>
-        
     </div>
-    
-
     <div>
         <h2> Words that often co-occurred with abusive tweets</h2>
         <ul class="wordsList" id = "wordsList"></ul> 
     </div>
-    
     <div id="mapWrapper"> 
         <g id="USmap" > </g>
     </div>
-
 </body>
 
 <script src="https://d3js.org/d3.v3.min.js"></script>
@@ -141,30 +118,25 @@
 <script src="https://d3js.org/queue.v1.min.js"></script>
 
 <script type="text/javascript">
+    
     // Defining useful variables
      var width = 900,
          height = 500;
-
     
     var projection = d3.geo.albersUsa()
         .scale(1000);
     
     var path = d3.geo.path()
         .projection(projection);
-    //  console.log(path)
    
     var svg = d3.select("#mapWrapper")
 		.append("svg")
-		//.attr("width", "100%");
         .attr("width", width)
         .attr("height", height);
-
           
     var scale = d3.scale.sqrt()
         .range([0,30])
         .domain([0,50]);
-    
-    var data;
     
     var word = "Total"
     
@@ -173,10 +145,11 @@
             .attr("height", height)
             .attr("transform","translate(500,500)");
     
-    
     // READ TWEET COUNTS FOR KEYWORDS    
     function renderKeywords(){
+        
         d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount.json",function(error, result){
+            
             data = result; 
             var insults = Object.keys(data)
             var totfrequency = Object.keys(data).map(function(key){
@@ -184,20 +157,17 @@
                 });
             for(var i=0; i<totfrequency.length;i++) totfrequency[i] = +totfrequency[i]/1;
 
-            //console.log(insults)
-            //console.log(totfrequency)
             function max(num){
                 return Math.max.apply(null, num);
             }
 
-            //console.log();
             var xscale = d3.scale.linear()
                             .domain([0,max(totfrequency)])
                             .range([0,150]);
 
             var yscale = d3.scale.linear()
                             .domain([0,insults.length])
-                            .range([0,180]);
+                            .range([0,182]);
 
             var canvas1 = d3.select('#hist1')
                             .append('svg')
@@ -229,15 +199,12 @@
                                 .attr('width',function(d){ return 0; });
 
             var heading = canvas1.append("text")
-                                //.attr("x", (width / 2))             
-                                //.attr("y", 0 - (margin.top / 2))
                                 .attr("transform", "translate(150,10)")
                                 .attr("text-anchor", "middle")  
                                 .style("font-size", "11px") 
                                 .style("text-decoration", "underline") 
                                 .style("font-weight", "bold") 
                                 .text("Frequency of various abusive words");
-
 
             var transit = d3.select("#hist1").selectAll("rect")
                                 .data(totfrequency)
@@ -257,10 +224,8 @@
 
             })
     };
-    
-    
+    // READ TWEET COUNTS FOR HASHTAGS
     function renderHashtags(){
-    // READ TWEETS FOR HASTAGS 
         d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount-hashtags.json",function(error, result){
                 data = result; 
                 var hashtags = Object.keys(data)
@@ -269,13 +234,10 @@
                     });
                 for(var i=0; i<hashfreq.length;i++) hashfreq[i] = +hashfreq[i]/1;
 
-                //console.log(hashtags)
-                //console.log(hashfreq)
                 function max(num){
                     return Math.max.apply(null, num);
                 }
 
-                //console.log();
                 var xscale = d3.scale.linear()
                                 .domain([0,max(hashfreq)])
                                 .range([0,150]);
@@ -313,15 +275,12 @@
                                     .attr('width',function(d){ return 0; });
 
                 var heading = canvas2.append("text")
-                                    //.attr("x", (width / 2))             
-                                    //.attr("y", 0 - (margin.top / 2))
                                     .attr("transform", "translate(180,10)")
                                     .attr("text-anchor", "middle")  
                                     .style("font-size", "11px") 
                                     .style("text-decoration", "underline") 
                                     .style("font-weight", "bold") 
                                     .text("Frequency of hashtags used with the words");
-
 
                 var transit = d3.select("#hist2").selectAll("rect")
                                     .data(hashfreq)
@@ -339,24 +298,20 @@
                                     .style("text-anchor", "middle")
                                     .text(function(d){ return d; }).style({'fill':'#fff','font-size':'11px'});
 
-                //console.log(d3.select('#yaxis1'));
                 d3.select('#yaxis1')
                     .selectAll('.tick')
                     .on('click',clickMe);
 
                 function clickMe(d){
-                    alert(hashtags[d]);
                     word = hashtags[d];        
                     plotDots();
                     };
-                    //console.log(word)};
-
             })
     };
-        
+    // READ TWEET COUNTS FOR MENTIONS
     function renderMentions(){
-        // READ TWEETS FOR MENTIONS 
         d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount-mentions.json",function(error, result){
+            
                 data = result; 
                 var mentions = Object.keys(data)
                 var mentfreq = Object.keys(data).map(function(key){
@@ -364,13 +319,10 @@
                     });
                 for(var i=0; i<mentfreq.length;i++) mentfreq[i] = +mentfreq[i]/1;
 
-                //console.log(mentions)
-                //console.log(mentfreq)
                 function max(num){
                     return Math.max.apply(null, num);
                 }
 
-                //console.log();
                 var xscale = d3.scale.linear()
                                 .domain([0,max(mentfreq)])
                                 .range([0,150]);
@@ -383,7 +335,6 @@
                                 .append('svg')
                                 .attr({'width':360,'height':200});
 
-
                 var yAxis = d3.svg.axis();
                     yAxis
                         .orient('left')
@@ -391,8 +342,7 @@
                         .tickSize(2)
                         .tickFormat(function(d,i){ return mentions[i]; })
                         .tickValues(d3.range(mentions.length));
-
-
+            
                 var y_xis = canvas3.append('g')
                                 .attr("transform", "translate(200,28)")
                                 .attr('id','yaxis2')
@@ -402,20 +352,14 @@
                                     .attr("transform", "translate(200,10)")
                                     .attr('id','bars3')
                                     .selectAll('rect')
-                                    //.attr("transform", "translate(450,50)")
                                     .data(mentfreq)
                                     .enter()
                                     .append('rect')
-                                    //.attr("x",450)
-                                    //.attr("y",300)
-                                    //.attr("transform", "translate(150,50)")
                                     .attr('height',12)
                                     .attr({'x':0,'y':function(d,i){ return yscale(i)+14; }})
                                     .attr('width',function(d){ return 0; });
 
                 var heading = canvas3.append("text")
-                                    //.attr("x", (width / 2))             
-                                    //.attr("y", 0 - (margin.top / 2))
                                     .attr("transform", "translate(210,10)")
                                     .attr("text-anchor", "middle")  
                                     .style("font-size", "11px") 
@@ -444,94 +388,70 @@
                     .on('click',clickMe);
 
                 function clickMe(d){
-                    alert(mentions[d]);
                     word = mentions[d];        
                     plotDots();
                     };
-            
-            
-            
-            
             })
     };
-
-
+    // READ TWEET COUNTS FOR MOST COMMON MENTIONED WORDS
     function renderWords(){
-        // READ TWEETS FOR CO OCCURRING WORDS
-    d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount-words.json",function(error, result){
-            data = result; 
-            var cowords = Object.keys(data);
-            var selection = list.selectAll("li")
-                .data(cowords,function(cowords){return cowords});
-            //console.log(cowords)
-            selection.enter()
-                .append("li")
-                .attr("class","listItem")
-                .text(function(cowrods,i){ return cowords[i]; })  
-        })
+        d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount-words.json",function(error, result){
+                data = result; 
+                var cowords = Object.keys(data);
+                var selection = list.selectAll("li")
+                    .data(cowords,function(cowords){return cowords});
+                selection.enter()
+                    .append("li")
+                    .attr("class","listItem")
+                    .text(function(cowrods,i){ return cowords[i]; })  
+            })
     };
-
-    // Useful functions
+    // READ TWEET COUNTS FOR MOST COMMON USED WORDS
     function highlight(name){
         svg.selectAll(".symbol")
             .style("stroke", function(d,i) {
                 return d.properties.name == name ? "black" : undefined
             })
     };
+    // READ TWEET COUNTS FOR MOST COMMON USED WORDS
     function unHighlight(){
         svg.selectAll(".symbol")
         svg.selectAll(".symbol")
             .style("stroke", undefined)
     };
-    
-    
-
-    // RENDERING MAP
+    // RENDERING BASEMAP
     function plotMap() {
         
        d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/us-states.json",function(error, result){
        us = result;
-       //console.log(us);
        if (error) throw error;   
-        //console.log(word);
         
        var counties = svg.append("path",".graticule")
                             .style("width", "100%")
-                            //.style("height", height)
                             .attr("class", "counties")
-                            //.attr("transform","translate(300,-100)")
                             .datum(topojson.feature(us, us.objects.counties))
-                            //.datum(topojson.mesh(us, us.objects.counties,function(a,b) {return a !== b &&  !(a.id/1000 ^ b.id /1000); }))
                             .attr("d", path);
-//        
+      
        var state_boundary = svg.append("path",".graticule")
                                 .style("width", "100%")
-                                //.style("width", width)
-                                //.style("height", height)
                                 .datum(topojson.mesh(us,us.objects.states, function(a,b){return a!==b;}))
                                 .attr("class","state-boundary")
                                 .attr("d",path);
         
        var land = svg.append("path",".graticule")
                         .style("width", "100%")
-                        //.style("width", width)
-                        //.style("height", height)
                         .datum(topojson.feature(us,us.objects.land))
                         .attr("class","land")
                         .attr("d",path);
-    })
+        })
     };
-           
-           
-                
-                
+       
+    // RENDERING NORMALIZED CONTRIBUTIONS PER COUNTY  
     function plotDots() {    
-        
 
         d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtDensity-counties.json",function(error, result){
             
             centroid = result;
-            //console.log(centroid);
             if (error) throw error;
             
             var symbol = svg.selectAll(".symbol")
@@ -545,10 +465,8 @@
 
             symbol
                .attr("d", path.pointRadius(function(d) {
-                        //console.log(d)
                         return scale(d.properties.twtDensity[word]);} ))
                .on("mousemove",function(d,i){
-                    //console.log(d)
                     highlight(d.properties.name);
                     d3.select("#tooltip").style({
                         visibility: "visible",
@@ -563,544 +481,24 @@
                    })
             });
         
-            
-
             symbol.transition()
                 .attr("path", path.pointRadius(function(d) {
-                    //console.log(d)
                     return scale(d.properties.twtDensity[word]); 
-                }));
+                }))
+                .duration(100) ;
         });
 
     };
        
-    
+    // Render the entire visualization.
     function renderVis(){
-    plotMap();
-    renderKeywords();
-    renderMentions();
-    renderWords();
-    plotDots();
-    renderHashtags();
+        plotMap();
+        renderKeywords();
+        renderMentions();
+        renderWords();
+        plotDots();
+        renderHashtags();
     }
     
     renderVis();
-    
-    
-    
 </script>
-
-<!-- <!DOCTYPE html>
-<meta charset="utf-8">
-<head>
-    
-    <title> Tweets US </title>
-    <style>
-    body {
-        font-family:"Lucida Grande","Droid Sans",Arial,Helvetica,sans-serif;
-    }
-
-    h2 {
-        font-family: arial, sans-serif;
-        font-size: 14px;
-        font-weight: bold;
-        margin-top: 0px;
-        margin-bottom: 10px;
-        text-align: center;
-    }
-    .symbol {
-        fill: steelblue;
-        fill-opacity: .8;
-        stroke-width = 1px;
-    }
-        
-    #tooltip {
-        position: absolute;
-        top: 0;
-        left: 0;
-        background-color: rgba(255,255,255,0.8);
-        padding: 5;
-        border: solid 1px black;
-        visibility: hidden;
-        font: 14px sans-serif;  
-    }
-        
-    .counties {
-        fill: rgb(242, 242, 242);
-        stroke: #999;
-        stroke-width = .005px; 
-    }
-        
-    #mapWrapper{
-        margin:2%;
-        padding:20px;
-        border:2px solid #d0d0d0;
-        border-radius: 5px; 
-    }
-    
-    .state-boundary{
-        fill: none;
-        stroke: #222; 
-    }
-        
-    #title{
-        font: 12px sans-serif; 
-        color: darkslateblue;
-    }
-    .land{
-        fill: none;
-        stroke: #222;
-    }
-        
-    #xaxis .domain {
-        fill:none;
-        stroke:#000;
-    }
-    #xaxis text, #yaxis text {
-        font-size: 12px;
-    }
-        
-    .wordsList {
-        margin: 0;
-        padding: 0;
-        list-style-type: none;
-        text-align: center;
-    }   
-
-    .listItem { display: inline; list-style-type: none;}
-
-    .listItem {
-        list-style-type: none;
-        text-decoration: none;
-        padding: .2em 1em;
-        color: #fff;
-        background-color: #036;
-    } 
-
-    </style>
-</head>
-
-
-<body >
-
-    <div id="title"> 
-        <h1> Offensive tweets towards women in the United States during the last 6 hours </h1>
-    </div>
-    <div id="tooltip"> Tooltip </div>
-    <div id="wrapper"> 
-        <g id="hist1">
-            <h2>Frequency of various abusive words</h2>
-        </g>
-        <g id="hist2">
-            <h2>Frequency of hashtags used with the words</h2>
-        </g>
-        <g id="hist3">
-            <h2>Frequency of users targetted by abusive words</h2>
-        </g>
-        
-    </div>
-    
-
-    <div>
-        <h2> Words that often co-occur with abusive words</h2>
-        <ul class="wordsList" id = "wordsList"></ul> 
-    </div>
-    
-    <div id="mapWrapper" preserveAspectRatio = "xMidYMid meet" viewbox = "0 0 500 200" width = 400 height = 300> 
-        <g id="USmap" > </g>
-    </div>
-
-</body>
-
-<script src="https://d3js.org/d3.v3.min.js"></script>
-<script src="https://d3js.org/topojson.v1.min.js"></script>
-<script src="https://d3js.org/queue.v1.min.js"></script>
-
-<script type="text/javascript">
-    // Defining useful variables
-     var width = 900,
-         height = 500;
-
-    
-    var projection = d3.geo.albersUsa()
-        .scale(800);
-    
-    var path = d3.geo.path()
-        .projection(projection);
-    //  console.log(path)
-   
-    var svg = d3.select("#mapWrapper")
-        .append("svg")
-        //.attr("width", "100%");
-        .attr("width", width)
-        .attr("height", height);
-
-          
-    var scale = d3.scale.sqrt()
-        .range([0,50])
-        .domain([0,100]);
-    
-    var data;
-    
-    var word = "Total"
-    
-    var list = d3.select("#wordsList")
-            .attr("width", width)
-            .attr("height", height);
-    
-    
-    // READ TWEET COUNTS FOR KEYWORDS    
-    function renderKeywords(){
-        d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount.json",function(error, result){
-            data = result; 
-            var insults = Object.keys(data)
-            var totfrequency = Object.keys(data).map(function(key){
-                return +data[key];
-                });
-            for(var i=0; i<totfrequency.length;i++) totfrequency[i] = +totfrequency[i]/1;
-
-            //console.log(insults)
-            //console.log(totfrequency)
-            function max(num){
-                return Math.max.apply(null, num);
-            }
-
-            //console.log();
-            var xscale = d3.scale.linear()
-                            .domain([0,max(totfrequency)])
-                            .range([0,150]);
-
-            var yscale = d3.scale.linear()
-                            .domain([0,insults.length])
-                            .range([0,150]);
-
-            var canvas1 = d3.select('#hist1')
-                            .append('svg')
-                            .attr({'width':200,'height':350});
-
-
-            var yAxis = d3.svg.axis();
-                yAxis
-                    .orient('left')
-                    .scale(yscale)
-                    .tickSize(2)
-                    .tickFormat(function(d,i){ return insults[i]; })
-                    .tickValues(d3.range(17));
-
-            var y_xis = canvas1.append('g')
-                              .attr("transform", "translate(50,20)")
-                              .attr('id','yaxis')
-                              .call(yAxis);
-
-            var chart = canvas1.append('g')
-                                .attr("transform", "translate(50,5)")
-                                .attr('id','bars')
-                                .selectAll('rect')
-                                .data(totfrequency)
-                                .enter()
-                                .append('rect')
-                                .attr('height',5)
-                                .attr({'x':0,'y':function(d,i){ return yscale(i)+14; }})
-                                .attr('width',function(d){ return 0; });
-
-            var heading = canvas1.append("text")
-                                //.attr("x", (width / 2))             
-                                //.attr("y", 0 - (margin.top / 2))
-                                .attr("transform", "translate(100,10)")
-                                .attr("text-anchor", "middle")  
-                                .style("font-size", "11px") 
-                                .style("text-decoration", "underline") 
-                                .style("font-weight", "bold") 
-                                .text("Frequency of various abusive words");
-
-
-            var transit = d3.select("#hist1").selectAll("rect")
-                                .data(totfrequency)
-                                .transition()
-                                .duration(1000) 
-                                .attr("width", function(d) {return xscale(d); });
-
-            })
-    };
-    
-    
-    function renderHashtags(){
-    // READ TWEETS FOR HASTAGS 
-        d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount-hashtags.json",function(error, result){
-                data = result; 
-                var hashtags = Object.keys(data)
-                var hashfreq = Object.keys(data).map(function(key){
-                    return +data[key];
-                    });
-                for(var i=0; i<hashfreq.length;i++) hashfreq[i] = +hashfreq[i]/1;
-
-                //console.log(hashtags)
-                //console.log(hashfreq)
-                function max(num){
-                    return Math.max.apply(null, num);
-                }
-
-                //console.log();
-                var xscale = d3.scale.linear()
-                                .domain([0,max(hashfreq)])
-                                .range([0,150]);
-
-                var yscale = d3.scale.linear()
-                                .domain([0,hashtags.length])
-                                .range([0,100]);
-
-                var canvas2 = d3.select('#hist2')
-                                .append('svg')
-                                .attr({'width':300,'height':350})
-
-
-                var yAxis = d3.svg.axis();
-                    yAxis
-                        .orient('left')
-                        .scale(yscale)
-                        .tickSize(2)
-                        .tickFormat(function(d,i){ return hashtags[i]; })
-                        .tickValues(d3.range(hashtags.length));
-
-                var y_xis = canvas2.append('g')
-                                  .attr("transform", "translate(180,35)")
-                                  .attr('id','yaxis1')
-                                  .call(yAxis);
-
-                var chart = canvas2.append('g')
-                                    .attr("transform", "translate(180,20)")
-                                    .attr('id','bars')
-                                    .selectAll('rect')
-                                    .data(hashfreq)
-                                    .enter()
-                                    .append('rect')
-                                    .attr('height',5)
-                                    .attr({'x':0,'y':function(d,i){ return yscale(i)+14; }})
-                                    .attr('width',function(d){ return 0; });
-
-                var heading = canvas2.append("text")
-                                    //.attr("x", (width / 2))             
-                                    //.attr("y", 0 - (margin.top / 2))
-                                    .attr("transform", "translate(170,12)")
-                                    .attr("text-anchor", "middle")  
-                                    .style("font-size", "11px") 
-                                    .style("text-decoration", "underline") 
-                                    .style("font-weight", "bold") 
-                                    .text("Frequency of hashtags used with the words");
-
-
-                var transit = d3.select("#hist2").selectAll("rect")
-                                    .data(hashfreq)
-                                    .transition()
-                                    .duration(1000) 
-                                    .attr("width", function(d) {return xscale(d);});
-
-                //console.log(d3.select('#yaxis1'));
-                d3.select('#yaxis1')
-                    .selectAll('.tick')
-                    .on('click',clickMe);
-
-                function clickMe(d){
-                    alert(hashtags[d]);
-                    
-                    
-                    d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/us-states.json",function(error,result){
-                        us = result;
-                        d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtDensity-counties.json",function(error,result){
-                            centroid = result;
-                            d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount.json",function(error,result){
-                                keywords = result;
-                                console.log(us);
-                                console.log(centroid);
-                                console.log(keywords);
-                                
-                                svg.selectAll("*").remove();
-                                plotMap(error,us,centroid,keywords);
-                            })
-                            })
-                        })
-                    };
-                    //console.log(word)};
-
-            })
-    };
-        
-    function renderMentions(){
-        // READ TWEETS FOR MENTIONS 
-        d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount-mentions.json",function(error, result){
-                data = result; 
-                var mentions = Object.keys(data)
-                var mentfreq = Object.keys(data).map(function(key){
-                    return +data[key];
-                    });
-                for(var i=0; i<mentfreq.length;i++) mentfreq[i] = +mentfreq[i]/1;
-
-                //console.log(mentions)
-                //console.log(mentfreq)
-                function max(num){
-                    return Math.max.apply(null, num);
-                }
-
-                //console.log();
-                var xscale = d3.scale.linear()
-                                .domain([0,max(mentfreq)])
-                                .range([0,150]);
-
-                var yscale = d3.scale.linear()
-                                .domain([0,mentions.length])
-                                .range([0,100]);
-
-                var canvas3 = d3.select('#hist3')
-                                .append('svg')
-                                .attr({'width':450,'height':350})
-
-
-                var yAxis = d3.svg.axis();
-                    yAxis
-                        .orient('left')
-                        .scale(yscale)
-                        .tickSize(2)
-                        .tickFormat(function(d,i){ return mentions[i]; })
-                        .tickValues(d3.range(mentions.length));
-
-                svg.select(".y.axis").on("click", function() { console.log("click!");});
-
-                var y_xis = canvas3.append('g')
-                                .attr("transform", "translate(250,20)")
-                                .attr('id','yaxis')
-                                .call(yAxis);
-
-                var chart = canvas3.append('g')
-                                    .attr("transform", "translate(250,5)")
-                                    .attr('id','bars')
-                                    .selectAll('rect')
-                                    //.attr("transform", "translate(450,50)")
-                                    .data(mentfreq)
-                                    .enter()
-                                    .append('rect')
-                                    //.attr("x",450)
-                                    //.attr("y",300)
-                                    //.attr("transform", "translate(150,50)")
-                                    .attr('height',5)
-                                    .attr({'x':0,'y':function(d,i){ return yscale(i)+14; }})
-                                    .attr('width',function(d){ return 0; });
-
-                var heading = canvas3.append("text")
-                                    //.attr("x", (width / 2))             
-                                    //.attr("y", 0 - (margin.top / 2))
-                                    .attr("transform", "translate(270,8)")
-                                    .attr("text-anchor", "middle")  
-                                    .style("font-size", "11px") 
-                                    .style("text-decoration", "underline") 
-                                    .style("font-weight", "bold") 
-                                    .text("Frequency of users targetted by abusive words");
-
-                var transit = d3.select("#hist3").selectAll("rect")
-                                    .data(mentfreq)
-                                    .transition()
-                                    .duration(1000) 
-                                    .attr("width", function(d) {return xscale(d);});
-
-            })
-    };
-
-
-    function renderWords(){
-        // READ TWEETS FOR CO OCCURRING WORDS
-    d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount-words.json",function(error, result){
-            data = result; 
-            var cowords = Object.keys(data);
-            var selection = list.selectAll("li")
-                .data(cowords,function(cowords){return cowords});
-            //console.log(cowords)
-            selection.enter()
-                .append("li")
-                .attr("class","listItem")
-                .text(function(cowrods,i){ return cowords[i]; })  
-        })
-    };
-
-    // Useful functions
-    function highlight(name){
-        svg.selectAll(".symbol")
-            .style("stroke", function(d,i) {
-                return d.properties.name == name ? "black" : undefined
-            })
-    };
-    function unHighlight(){
-        svg.selectAll(".symbol")
-        svg.selectAll(".symbol")
-            .style("stroke", undefined)
-    };
-    
-    
-    // Read source files
-    queue()
-        .defer(d3.json, "https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/us-states.json")
-        .defer(d3.json,  "https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtDensity-counties.json") // "us-state-centroids.json")
-        .defer(d3.json,  "https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount.json") // "us-state-centroids.json")
-        .await(plotMap);
-    
-    renderKeywords();
-    renderHashtags();
-    renderMentions();
-    renderWords();
-    
-    // RENDERING MAP
-    function plotMap(error, us, centroid, keywords) {
-      if (error) throw error;   
-        console.log(word);
-        
-        var counties = svg.append("path",".graticule")
-                            .style("width", "100%")
-                            //.style("height", height)
-                            .attr("class", "counties")
-                            //.attr("transform","translate(300,-100)")
-                            .datum(topojson.feature(us, us.objects.counties))
-                            //.datum(topojson.mesh(us, us.objects.counties,function(a,b) {return a !== b &&  !(a.id/1000 ^ b.id /1000); }))
-                            .attr("d", path);
-        
-        var state_boundary = svg.append("path",".graticule")
-                                .style("width", "100%")
-                                //.style("width", width)
-                                //.style("height", height)
-                                .datum(topojson.mesh(us,us.objects.states, function(a,b){return a!==b;}))
-                                .attr("class","state-boundary")
-                                .attr("d",path);
-        
-        var land = svg.append("path",".graticule")
-                        .style("width", "100%")
-                        //.style("width", width)
-                        //.style("height", height)
-                        .datum(topojson.feature(us,us.objects.land))
-                        .attr("class","land")
-                        .attr("d",path);
-        
-
-       var symbol = svg.selectAll(".symbol")
-                       .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }))
-                       .enter().append("path")
-                       .attr("class", "symbol")
-                       .attr("d", path.pointRadius(function(d) {
-                           return scale(d.properties.twtDensity[word]); })) // change to twtDensity
-                       .on("mouseenter",function(d,i){
-                           console.log(d.properties)
-                           highlight(d.properties.name);
-                           d3.select("#tooltip").style({
-                               visibility: "visible",
-                               top: (d3.event.clientY)+"px",
-                               left: (d3.event.clientX)+"px",
-                               opacity: 1
-                           }).text(d.properties.name + ":" + d.properties.twtDensity[word]+'%')
-                       })
-                       .on("mouseleave",function(d,i){
-                           unHighlight();
-                           d3.select("#tooltip").style({
-                               visibility: "hidden"
-                           })
-                       })
-    }
-    
-    
-    
-</script> -->
