@@ -126,7 +126,7 @@
     
 
     <div>
-        <h2> Words that often co-occurred with abusive words</h2>
+        <h2> Words that often co-occurred with abusive tweets</h2>
         <ul class="wordsList" id = "wordsList"></ul> 
     </div>
     
@@ -395,7 +395,7 @@
 
                 var y_xis = canvas3.append('g')
                                 .attr("transform", "translate(200,28)")
-                                .attr('id','yaxis')
+                                .attr('id','yaxis2')
                                 .call(yAxis);
 
                 var chart = canvas3.append('g')
@@ -438,18 +438,20 @@
                                     .attr("transform", "translate(12, 9)")
                                     .style("text-anchor", "middle")
                                     .text(function(d){ return d; }).style({'fill':'#fff','font-size':'10px'});
-            
-                //console.log(d3.select('#yaxis1'));
-                d3.select('#yaxis')
+
+                d3.select('#yaxis2')
                     .selectAll('.tick')
                     .on('click',clickMe);
 
                 function clickMe(d){
                     alert(mentions[d]);
                     word = mentions[d];        
-                    renderMap();
+                    plotDots();
                     };
-
+            
+            
+            
+            
             })
     };
 
@@ -575,8 +577,8 @@
     
     function renderVis(){
     plotMap();
-    //renderKeywords();
-    //renderMentions();
+    renderKeywords();
+    renderMentions();
     renderWords();
     plotDots();
     renderHashtags();
