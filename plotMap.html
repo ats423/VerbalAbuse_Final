@@ -541,13 +541,13 @@
            .attr("d", path.pointRadius(function(d) {
                     //console.log(d)
                     return scale(d.properties.twtDensity[word]);} ))
-           .on("mouseenter",function(d,i){
+           .on("mousemove",function(d,i){
                 //console.log(d)
                 highlight(d.properties.name);
                 d3.select("#tooltip").style({
                     visibility: "visible",
-                    top: (d3.event.clientY)+"px",
-                    left: (d3.event.clientX)+"px",
+                    top: (d3.event.pageY)+"px",
+                    left: (d3.event.pageX)+"px",
                     opacity: 1
                 }).text(d.properties.name + ',' + d.properties.state + ":" + d.properties.twtDensity[word]+'%')})
            .on("mouseleave",function(d,i){
