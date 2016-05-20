@@ -347,7 +347,7 @@
                 function clickMe(d){
                     alert(hashtags[d]);
                     word = hashtags[d];        
-                    renderMap();
+                    plotDots();
                     };
                     //console.log(word)};
 
@@ -483,23 +483,17 @@
     };
     
     
-    function renderMap(){ 
-    
-    // Read source files
-    queue()
-        .defer(d3.json, "https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/us-states.json")
-        .defer(d3.json,  "https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtDensity-counties.json") // "us-state-centroids.json")
-        .defer(d3.json,  "https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtCount.json") //s-state-centroids.json")
-        .await(plotMap);
-    
+
     // RENDERING MAP
-    function plotMap(error, us, centroid, keywords) {
-        console.log(us);
-        console.log(centroid);
-      if (error) throw error;   
+    function plotMap() {
+        
+       d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/us-states.json",function(error, result){
+       us = result;
+       //console.log(us);
+       if (error) throw error;   
         //console.log(word);
         
-        var counties = svg.append("path",".graticule")
+       var counties = svg.append("path",".graticule")
                             .style("width", "100%")
                             //.style("height", height)
                             .attr("class", "counties")
@@ -507,8 +501,8 @@
                             .datum(topojson.feature(us, us.objects.counties))
                             //.datum(topojson.mesh(us, us.objects.counties,function(a,b) {return a !== b &&  !(a.id/1000 ^ b.id /1000); }))
                             .attr("d", path);
-        
-        var state_boundary = svg.append("path",".graticule")
+//        
+       var state_boundary = svg.append("path",".graticule")
                                 .style("width", "100%")
                                 //.style("width", width)
                                 //.style("height", height)
@@ -516,66 +510,79 @@
                                 .attr("class","state-boundary")
                                 .attr("d",path);
         
-        var land = svg.append("path",".graticule")
+       var land = svg.append("path",".graticule")
                         .style("width", "100%")
                         //.style("width", width)
                         //.style("height", height)
                         .datum(topojson.feature(us,us.objects.land))
                         .attr("class","land")
                         .attr("d",path);
+    })
+    };
+           
+           
+                
+                
+    function plotDots() {    
         
-       var symbol = svg.selectAll(".symbol")
+
+        d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-2-INET-Twitter-Verbal-Abuse/master/input_files/twtDensity-counties.json",function(error, result){
+            
+            centroid = result;
+            //console.log(centroid);
+            if (error) throw error;
+            
+            var symbol = svg.selectAll(".symbol")
                        .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }));
-        
-       
-        
-//       var symbol2 = svg.selectAll("path")
-//                       .data(centroid.features.sort(function(a, b) {return b.properties.population - a.properties.population; }));
-        
-       
-       symbol
-           .enter().append("path")
-           .attr("class", "symbol")
-       
-       symbol
-           .attr("d", path.pointRadius(function(d) {
+            
+            symbol.exit().remove();
+            
+            symbol
+               .enter().append("path")
+               .attr("class", "symbol")
+
+            symbol
+               .attr("d", path.pointRadius(function(d) {
+                        //console.log(d)
+                        return scale(d.properties.twtDensity[word]);} ))
+               .on("mousemove",function(d,i){
                     //console.log(d)
-                    return scale(d.properties.twtDensity[word]);} ))
-           .on("mousemove",function(d,i){
-                //console.log(d)
-                highlight(d.properties.name);
-                d3.select("#tooltip").style({
-                    visibility: "visible",
-                    top: (d3.event.pageY)+"px",
-                    left: (d3.event.pageX)+"px",
-                    opacity: 1
-                }).text(d.properties.name + ',' + d.properties.state + ":" + d.properties.twtDensity[word]+'%')})
-           .on("mouseleave",function(d,i){
-               unHighlight();
-               d3.select("#tooltip").style({
-                   visibility: "hidden"
-               })
+                    highlight(d.properties.name);
+                    d3.select("#tooltip").style({
+                        visibility: "visible",
+                        top: (d3.event.pageY)+"px",
+                        left: (d3.event.pageX)+"px",
+                        opacity: 1
+                    }).text(d.properties.name + ',' + d.properties.state + ":" + d.properties.twtDensity[word]+'%')})
+               .on("mouseleave",function(d,i){
+                   unHighlight();
+                   d3.select("#tooltip").style({
+                       visibility: "hidden"
+                   })
             });
         
-        symbol.exit().remove();
-        
-        symbol.transition()
-            .attr("path", path.pointRadius(function(d) {
-                console.log(d)
-                return scale(d.properties.twtDensity[word]); 
-            }));
-    
+            
+
+            symbol.transition()
+                .attr("path", path.pointRadius(function(d) {
+                    //console.log(d)
+                    return scale(d.properties.twtDensity[word]); 
+                }));
+        });
 
     };
        
-    };
     
-    
-    renderMap();
-    renderKeywords();
-    renderHashtags();
-    renderMentions();
+    function renderVis(){
+    plotMap();
+    //renderKeywords();
+    //renderMentions();
     renderWords();
+    plotDots();
+    renderHashtags();
+    }
+    
+    renderVis();
     
     
     
