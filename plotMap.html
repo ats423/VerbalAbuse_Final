@@ -210,7 +210,7 @@
                     .scale(yscale)
                     .tickSize(2)
                     .tickFormat(function(d,i){ return insults[i]; })
-                    .tickValues(d3.range(17));
+                    .tickValues(d3.range(insults.length));
 
             var y_xis = canvas1.append('g')
                               .attr("transform", "translate(100,25)")
